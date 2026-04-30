@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Avatares{% endblock %}
+
+{% block page_content %}
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('index') }}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">BetterMe</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('avatars') }}">
+                <i class="fas fa-fw fa-user-circle"></i>
+                <span>Avatares</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Usuario</span>
+                            <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{{ url_for('index') }}">
+                                <i class="fas fa-home fa-sm fa-fw mr-2"></i> Inicio
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">
+                    <i class="fas fa-user-circle"></i> Galería de Avatares
+                </h1>
+                <p class="mb-4">Selecciona un avatar para personalizar tu perfil.</p>
+
+                <div class="row">
+                    {% for i in range(1, 7) %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card shadow text-center">
+                            <div class="card-body py-4">
+                                <img class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;"
+                                     src="{{ url_for('static', filename='avatars/avatar_' ~ i ~ '.png') }}"
+                                     alt="Avatar {{ i }}"
+                                     onerror="this.src='{{ url_for('static', filename='img/undraw_profile.svg') }}'">
+                                <h5 class="card-title">Avatar {{ i }}</h5>
+                                <button class="btn btn-primary btn-sm" onclick="alert('Avatar {{ i }} seleccionado')">
+                                    <i class="fas fa-check"></i> Seleccionar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>&copy; 2024 BetterMe</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Si no hay imágenes de avatar reales, se mostrará el SVG por defecto (onerror)
+    });
+</script>
+{% endblock %}

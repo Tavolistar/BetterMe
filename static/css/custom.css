@@ -1,0 +1,74 @@
+/* ============================================================
+   BetterMe - Estilos Personalizados
+   ============================================================ */
+
+/* ─── Transiciones y efectos ─────────────────────────────────── */
+
+.task-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── Animación de barras de progreso ───────────────────────── */
+
+.progress-bar {
+    transition: width 1s ease-in-out;
+}
+
+/* ─── Notificaciones flotantes ──────────────────────────────── */
+
+.alert-floating {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 250px;
+}
+
+/* ─── Avatar en galería ─────────────────────────────────────── */
+
+.avatar-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ─── Hero section en landing page ──────────────────────────── */
+
+.hero-section {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    padding: 80px 0;
+}
+
+/* ─── Sidebar brand personalizado ───────────────────────────── */
+
+.sidebar-brand .sidebar-brand-icon i {
+    font-size: 1.5rem;
+}
+
+/* ─── Checkbox personalizado para hábitos/tareas ────────────── */
+
+.task-card .form-check-input:checked + .form-check-label {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* ─── Responsive: ajustes para móviles ──────────────────────── */
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 40px 0;
+    }
+
+    .hero-section h1 {
+        font-size: 1.8rem;
+    }
+}

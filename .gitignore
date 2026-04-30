@@ -1,0 +1,30 @@
+# Entorno virtual
+.venv/
+da/.venv/
+
+# Base de datos SQLite
+instance/
+*.db
+
+# Variables de entorno (contienen secretos)
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archivos del template original (startbootstrap)
+startbootstrap-sb-admin-2-gh-pages/
+startbootstrap-sb-admin-2-gh-pages.zip
+
+# Carpeta antigua (backup)
+da/

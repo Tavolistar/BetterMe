@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Inicio{% endblock %}
+
+{% block page_content %}
+<!-- Navegación simple -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary static-top">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <i class="fas fa-leaf"></i> BetterMe
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="display-4 font-weight-bold">Bienvenido a BetterMe</h1>
+        <p class="lead">Tu asistente personal para desarrollar hábitos positivos y alcanzar tus metas.</p>
+        <div class="mt-4">
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg mr-2">
+                <i class="fas fa-rocket"></i> Comenzar Gratis
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Características -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card text-center h-100 shadow">
+                    <div class="card-body">
+                        <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Seguimiento de Hábitos</h5>
+                        <p class="card-text">Registra y da seguimiento a tus hábitos diarios. Marca como completados y acumula recompensas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card text-center h-100 shadow">
+                    <div class="card-body">
+                        <i class="fas fa-fire fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Sistema de Rachas</h5>
+                        <p class="card-text">Mantén la consistencia día tras día. Cada racha cuenta y te motiva a seguir adelante.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card text-center h-100 shadow">
+                    <div class="card-body">
+                        <i class="fas fa-coins fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Recompensas</h5>
+                        <p class="card-text">Gana monedas por cada hábito completado. ¡Tu esfuerzo tiene recompensa!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3">
+    <div class="container">
+        <p class="mb-0">&copy; 2024 BetterMe. Todos los derechos reservados.</p>
+    </div>
+</footer>
+{% endblock %}

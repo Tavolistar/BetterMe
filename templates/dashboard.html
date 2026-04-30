@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Dashboard{% endblock %}
+
+{% block page_content %}
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('index') }}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">BetterMe</div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Avatares -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('avatars') }}">
+                <i class="fas fa-fw fa-user-circle"></i>
+                <span>Avatares</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Toggler -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Usuario BetterMe</span>
+                            <img class="img-profile rounded-circle"
+                                 src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="{{ url_for('avatars') }}">
+                                <i class="fas fa-user-circle fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Avatares
+                            </a>
+                            <a class="dropdown-item" href="{{ url_for('index') }}">
+                                <i class="fas fa-home fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Inicio
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+
+                </ul>
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-leaf text-primary"></i> Dashboard BetterMe
+                    </h1>
+                    <a href="#" onclick="resetAll()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <i class="fas fa-redo fa-sm text-white-50"></i> Resetear Día
+                    </a>
+                </div>
+
+                <!-- Content Row - Stats Cards -->
+                <div class="row">
+
+                    <!-- Monedas Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Monedas</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ coins }} <i class="fas fa-coins text-warning"></i></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-coins fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Racha Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Racha Actual</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ streak }} días</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-fire fa-2x text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progreso Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Progreso Hoy</div>
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col-auto">
+                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ progress_percentage }}%</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="progress progress-sm mr-2">
+                                                    <div class="progress-bar bg-info" role="progressbar"
+                                                         style="width: {{ progress_percentage }}%" aria-valuenow="{{ progress_percentage }}" aria-valuemin="0"
+                                                         aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hábitos Completados Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Hábitos Hoy</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ completed_habits }}/{{ total_habits }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-trophy fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row - Main Content -->
+                <div class="row">
+
+                    <!-- BetterMe System Card -->
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <!-- Card Header -->
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">🎯 Sistema BetterMe</h6>
+                                <div class="dropdown no-arrow">
+                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                         aria-labelledby="dropdownMenuLink">
+                                        <div class="dropdown-header">Opciones:</div>
+                                        <a class="dropdown-item" href="#" onclick="resetAll()">
+                                            <i class="fas fa-redo fa-sm fa-fw mr-2"></i>Resetear día
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="addSampleTasks()">
+                                            <i class="fas fa-magic fa-sm fa-fw mr-2"></i>Ejemplo rápido
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <!-- Formulario para nueva tarea -->
+                                <form action="{{ url_for('add_task') }}" method="POST" class="mb-4">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="task_text"
+                                               placeholder="¿Qué hábito quieres agregar hoy? Ej: Meditar 10 min, Estudiar inglés..."
+                                               required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-plus"></i> Añadir
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Agrega hábitos positivos que quieras desarrollar</small>
+                                </form>
+
+                                <!-- Hábitos predefinidos -->
+                                <h6 class="mb-3">🏆 Hábitos Diarios (Haz click para marcar/desmarcar):</h6>
+                                <div class="row mb-4">
+                                    {% for habit in habits %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card border-secondary task-card {% if habit.completed %}border-success bg-light{% endif %}"
+                                             onclick="toggleHabit({{ habit.id }})">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="form-check mb-0">
+                                                        <input type="checkbox" class="form-check-input" id="habit{{ habit.id }}"
+                                                               {% if habit.completed %}checked{% endif %}>
+                                                        <label class="form-check-label ml-2" for="habit{{ habit.id }}">
+                                                            {{ habit.name }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="badge badge-warning">
+                                                        +{{ habit.coins }} <i class="fas fa-coins"></i>
+                                                    </span>
+                                                </div>
+                                                {% if habit.description %}
+                                                <small class="text-muted d-block mt-1">{{ habit.description }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Tareas personalizadas -->
+                                <h6 class="mb-3">📝 Tus Tareas Personalizadas:</h6>
+                                <div id="tasksList">
+                                    {% if tasks %}
+                                        {% for task in tasks %}
+                                        <div class="card mb-2 {% if task.completed %}border-success bg-light{% else %}border-secondary{% endif %}">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="form-check mb-0">
+                                                        <input type="checkbox" class="form-check-input" id="task{{ task.id }}"
+                                                               {% if task.completed %}checked{% endif %}
+                                                               onclick="toggleTask({{ task.id }})">
+                                                        <label class="form-check-label ml-2 {% if task.completed %}text-muted text-decoration-line-through{% endif %}"
+                                                               for="task{{ task.id }}">
+                                                            {{ task.text }}
+                                                        </label>
+                                                    </div>
+                                                    <div>
+                                                        <small class="text-muted mr-2">{{ task.created_at.strftime('%H:%M') if task.created_at else '' }}</small>
+                                                        <a href="{{ url_for('delete_task', task_id=task.id) }}" class="btn btn-sm btn-outline-danger"
+                                                           onclick="return confirm('¿Eliminar esta tarea?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i> No has agregado tareas personalizadas. ¡Empieza agregando una arriba!
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Panel -->
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-pie"></i> Progreso
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <img class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"
+                                         src="{{ url_for('static', filename='img/undraw_profile.svg') }}"
+                                         alt="Avatar">
+                                    <h5 class="mt-2">Usuario BetterMe</h5>
+                                </div>
+                                <div class="mt-4 text-center small">
+                                    <span class="mr-2">
+                                        <i class="fas fa-circle text-success"></i> Completados: {{ completed_habits }}
+                                    </span>
+                                    <span class="mr-2">
+                                        <i class="fas fa-circle text-secondary"></i> Pendientes: {{ total_habits - completed_habits }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>&copy; 2024 BetterMe. Todos los derechos reservados.</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+{% endblock %}
