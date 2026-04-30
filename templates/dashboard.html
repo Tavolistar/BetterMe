@@ -67,9 +67,9 @@
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Usuario BetterMe</span>
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.get('user_name', 'Usuario') }}</span>
                             <img class="img-profile rounded-circle"
-                                 src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                                 src="{{ url_for('static', filename='img/' ~ session.get('user_avatar', 'undraw_profile.svg')) }}">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -83,7 +83,7 @@
                                 Inicio
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ url_for('login') }}">
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Cerrar Sesión
                             </a>
@@ -238,28 +238,28 @@
                                     <small class="form-text text-muted">Agrega hábitos positivos que quieras desarrollar</small>
                                 </form>
 
-                                <!-- Hábitos predefinidos -->
+                                <!-- Hábitos predefinidos (por usuario) -->
                                 <h6 class="mb-3">🏆 Hábitos Diarios (Haz click para marcar/desmarcar):</h6>
                                 <div class="row mb-4">
-                                    {% for habit in habits %}
+                                    {% for item in user_habits_data %}
                                     <div class="col-md-4 mb-3">
-                                        <div class="card border-secondary task-card {% if habit.completed %}border-success bg-light{% endif %}"
-                                             onclick="toggleHabit({{ habit.id }})">
+                                        <div class="card border-secondary task-card {% if item.user_habit.completed %}border-success bg-light{% endif %}"
+                                             onclick="toggleHabit({{ item.habit.id }})">
                                             <div class="card-body py-2">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div class="form-check mb-0">
-                                                        <input type="checkbox" class="form-check-input" id="habit{{ habit.id }}"
-                                                               {% if habit.completed %}checked{% endif %}>
-                                                        <label class="form-check-label ml-2" for="habit{{ habit.id }}">
-                                                            {{ habit.name }}
+                                                        <input type="checkbox" class="form-check-input" id="habit{{ item.habit.id }}"
+                                                               {% if item.user_habit.completed %}checked{% endif %}>
+                                                        <label class="form-check-label ml-2" for="habit{{ item.habit.id }}">
+                                                            {{ item.habit.name }}
                                                         </label>
                                                     </div>
                                                     <span class="badge badge-warning">
-                                                        +{{ habit.coins }} <i class="fas fa-coins"></i>
+                                                        +{{ item.habit.coins }} <i class="fas fa-coins"></i>
                                                     </span>
                                                 </div>
-                                                {% if habit.description %}
-                                                <small class="text-muted d-block mt-1">{{ habit.description }}</small>
+                                                {% if item.habit.description %}
+                                                <small class="text-muted d-block mt-1">{{ item.habit.description }}</small>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -316,9 +316,9 @@
                             <div class="card-body">
                                 <div class="text-center mb-3">
                                     <img class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"
-                                         src="{{ url_for('static', filename='img/undraw_profile.svg') }}"
+                                         src="{{ url_for('static', filename='img/' ~ session.get('user_avatar', 'undraw_profile.svg')) }}"
                                          alt="Avatar">
-                                    <h5 class="mt-2">Usuario BetterMe</h5>
+                                    <h5 class="mt-2">{{ session.get('user_name', 'Usuario') }}</h5>
                                 </div>
                                 <div class="mt-4 text-center small">
                                     <span class="mr-2">

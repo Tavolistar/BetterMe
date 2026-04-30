@@ -18,34 +18,57 @@
                                     </h1>
                                     <p class="mb-4">Crea tu cuenta y comienza a mejorar.</p>
                                 </div>
-                                <form class="user">
-                                    <div class="form-group row">
-                                        <div class="col-sm-6 mb-3 mb-sm-0">
-                                            <input type="text" class="form-control form-control-user"
-                                                   id="exampleFirstName" placeholder="Nombre">
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="form-control form-control-user"
-                                                   id="exampleLastName" placeholder="Apellido">
-                                        </div>
+
+                                <form class="user" method="POST" action="{{ url_for('register') }}">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user"
+                                               name="name" id="registerName"
+                                               placeholder="Nombre completo" required>
                                     </div>
                                     <div class="form-group">
                                         <input type="email" class="form-control form-control-user"
-                                               id="exampleInputEmail" placeholder="Correo electrónico">
+                                               name="email" id="registerEmail"
+                                               placeholder="Correo electrónico" required>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-6 mb-3 mb-sm-0">
                                             <input type="password" class="form-control form-control-user"
-                                                   id="exampleInputPassword" placeholder="Contraseña">
+                                                   name="password" id="registerPassword"
+                                                   placeholder="Contraseña (mín. 6 caracteres)" required minlength="6">
                                         </div>
                                         <div class="col-sm-6">
                                             <input type="password" class="form-control form-control-user"
-                                                   id="exampleRepeatPassword" placeholder="Repetir contraseña">
+                                                   name="confirm_password" id="registerConfirmPassword"
+                                                   placeholder="Repetir contraseña" required minlength="6">
                                         </div>
                                     </div>
-                                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-user btn-block">
+
+                                    <!-- Selección de hábitos diarios -->
+                                    <div class="form-group">
+                                        <label class="small font-weight-bold text-primary">
+                                            <i class="fas fa-check-circle"></i> Selecciona tus hábitos diarios:
+                                        </label>
+                                        <div class="border rounded p-3 bg-light">
+                                            {% for habit in habits %}
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input"
+                                                       name="habits" value="{{ habit.id }}"
+                                                       id="habit_{{ habit.id }}" checked>
+                                                <label class="custom-control-label" for="habit_{{ habit.id }}">
+                                                    <strong>{{ habit.name }}</strong>
+                                                    <small class="text-muted"> — {{ habit.description }} (+{{ habit.coins }} <i class="fas fa-coins"></i>)</small>
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                            <small class="text-muted d-block mt-2">
+                                                <i class="fas fa-info-circle"></i> Puedes desmarcar los que no quieras. Siempre podrás cambiarlos después desde el dashboard.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
                                         <i class="fas fa-user-plus"></i> Registrarse
-                                    </a>
+                                    </button>
                                 </form>
                                 <hr>
                                 <div class="text-center">

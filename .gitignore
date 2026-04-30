@@ -18,6 +18,10 @@ __pycache__/
 .vscode/
 .idea/
 
+# Archivos temporales de pruebas
+cookies.txt
+register_test.html
+
 # OS
 .DS_Store
 Thumbs.db

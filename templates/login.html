@@ -20,29 +20,31 @@
                                     </h1>
                                     <p class="mb-4">¡Bienvenido de nuevo! Inicia sesión para continuar.</p>
                                 </div>
-                                <form class="user">
+
+                                <form class="user" method="POST" action="{{ url_for('login') }}">
                                     <div class="form-group">
                                         <input type="email" class="form-control form-control-user"
-                                               id="exampleInputEmail" aria-describedby="emailHelp"
-                                               placeholder="Correo electrónico">
+                                               name="email" id="loginEmail"
+                                               placeholder="Correo electrónico" required>
                                     </div>
                                     <div class="form-group">
                                         <input type="password" class="form-control form-control-user"
-                                               id="exampleInputPassword" placeholder="Contraseña">
+                                               name="password" id="loginPassword"
+                                               placeholder="Contraseña" required>
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-checkbox small">
-                                            <input type="checkbox" class="custom-control-input" id="customCheck">
+                                            <input type="checkbox" class="custom-control-input" name="remember" id="customCheck">
                                             <label class="custom-control-label" for="customCheck">Recordarme</label>
                                         </div>
                                     </div>
-                                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-user btn-block">
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
                                         <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                                    </a>
+                                    </button>
                                 </form>
                                 <hr>
                                 <div class="text-center">
-                                    <a class="small" href="#">¿Olvidaste tu contraseña?</a>
+                                    <a class="small" href="{{ url_for('reset_password') }}">¿Olvidaste tu contraseña?</a>
                                 </div>
                                 <div class="text-center">
                                     <a class="small" href="{{ url_for('register') }}">¿No tienes cuenta? ¡Regístrate!</a>
