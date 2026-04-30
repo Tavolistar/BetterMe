@@ -86,9 +86,6 @@ def get_user_habits(user_id):
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     """Registro de nuevo usuario."""
-    # Obtener hábitos disponibles para mostrar en el formulario
-    available_habits = Habit.query.all()
-
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
@@ -98,30 +95,21 @@ def register():
         # Validaciones
         if not name or not email or not password:
             flash('Todos los campos son obligatorios.', 'danger')
-            return render_template("register.html", habits=available_habits)
+            return render_template("register.html")
 
         if password != confirm_password:
             flash('Las contraseñas no coinciden.', 'danger')
-            return render_template("register.html", habits=available_habits)
+            return render_template("register.html")
 
         if len(password) < 6:
             flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
-            return render_template("register.html", habits=available_habits)
+            return render_template("register.html")
 
         # Verificar si el email ya está registrado
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash('Ya existe una cuenta con este correo electrónico.', 'danger')
-            return render_template("register.html", habits=available_habits)
-
-        # Obtener hábitos seleccionados por el usuario
-        selected_habit_ids = request.form.getlist('habits')
-        # Convertir a enteros
-        selected_habit_ids = [int(hid) for hid in selected_habit_ids if hid.isdigit()]
-
-        if not selected_habit_ids:
-            flash('Debes seleccionar al menos un hábito diario.', 'danger')
-            return render_template("register.html", habits=available_habits)
+            return render_template("register.html")
 
         # Crear usuario
         user = User(name=name, email=email)
@@ -133,17 +121,18 @@ def register():
         progress = UserProgress(user_id=user.id, coins=100, streak=0)
         db.session.add(progress)
 
-        # Crear UserHabit solo para los hábitos seleccionados
-        for habit_id in selected_habit_ids:
-            uh = UserHabit(user_id=user.id, habit_id=habit_id, completed=False)
-            db.session.add(uh)
-
         db.session.commit()
 
-        flash('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.', 'success')
-        return redirect(url_for('login'))
+        # Iniciar sesión automáticamente
+        session['user_id'] = user.id
+        session['user_name'] = user.name
+        session['user_email'] = user.email
+        session['user_avatar'] = user.avatar
 
-    return render_template("register.html", habits=available_habits)
+        flash('¡Bienvenido a BetterMe! Ahora configura tus hábitos diarios.', 'success')
+        return redirect(url_for('setup_habits'))
+
+    return render_template("register.html")
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -289,6 +278,75 @@ def avatars():
     return render_template("avatars.html")
 
 
+# ─── Onboarding: Configuración inicial de hábitos ────────────────────
+
+@app.route("/setup_habits", methods=['GET', 'POST'])
+@login_required
+def setup_habits():
+    """Pantalla de configuración de hábitos diarios.
+    Se muestra al registrarse o cuando el usuario quiere modificar sus hábitos."""
+    user_id = session['user_id']
+    available_habits = Habit.query.filter_by(is_custom=False).all()
+
+    if request.method == 'POST':
+        # Obtener hábitos predefinidos seleccionados
+        selected_habit_ids = request.form.getlist('habits')
+        selected_habit_ids = [int(hid) for hid in selected_habit_ids if hid.isdigit()]
+
+        # Obtener hábitos personalizados escritos por el usuario
+        custom_names = request.form.getlist('custom_habit_name')
+        custom_descriptions = request.form.getlist('custom_habit_desc')
+        custom_coins_list = request.form.getlist('custom_habit_coins')
+
+        # Validar que haya al menos un hábito (predefinido o personalizado)
+        if not selected_habit_ids and not any(n.strip() for n in custom_names):
+            flash('Debes seleccionar o crear al menos un hábito diario.', 'danger')
+            return render_template("setup_habits.html", habits=available_habits)
+
+        # Eliminar todos los UserHabit actuales del usuario (para reemplazar)
+        UserHabit.query.filter_by(user_id=user_id).delete()
+
+        # Crear UserHabit para los hábitos predefinidos seleccionados
+        for habit_id in selected_habit_ids:
+            uh = UserHabit(user_id=user_id, habit_id=habit_id, completed=False)
+            db.session.add(uh)
+
+        # Crear hábitos personalizados
+        for i, name in enumerate(custom_names):
+            name = name.strip()
+            if not name:
+                continue
+            desc = custom_descriptions[i].strip() if i < len(custom_descriptions) else ''
+            coins_val = int(custom_coins_list[i]) if i < len(custom_coins_list) and custom_coins_list[i].isdigit() else 5
+
+            new_habit = Habit(
+                name=name,
+                description=desc,
+                coins=coins_val,
+                is_custom=True,
+                user_id=user_id
+            )
+            db.session.add(new_habit)
+            db.session.flush()
+
+            uh = UserHabit(user_id=user_id, habit_id=new_habit.id, completed=False)
+            db.session.add(uh)
+
+        db.session.commit()
+        flash('¡Tus hábitos diarios han sido configurados!', 'success')
+        return redirect(url_for('dashboard'))
+
+    # GET: mostrar los hábitos actuales del usuario (si ya tiene)
+    user_habits_data = get_user_habits(user_id)
+    selected_ids = [uh['habit'].id for uh in user_habits_data if not uh['habit'].is_custom]
+    custom_habits = [uh['habit'] for uh in user_habits_data if uh['habit'].is_custom]
+
+    return render_template("setup_habits.html",
+                           habits=available_habits,
+                           selected_ids=selected_ids,
+                           custom_habits=custom_habits)
+
+
 # ─── Rutas del Dashboard (protegidas) ───────────────────────────────
 
 @app.route("/dashboard")
@@ -297,8 +355,13 @@ def dashboard():
     """Dashboard principal con tareas, hábitos y progreso."""
     user_id = session['user_id']
 
-    tasks = Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all()
+    # Si el usuario no tiene hábitos configurados, redirigir al onboarding
     user_habits_data = get_user_habits(user_id)
+    if not user_habits_data:
+        flash('Configura tus hábitos diarios para comenzar.', 'info')
+        return redirect(url_for('setup_habits'))
+
+    tasks = Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all()
     progress = UserProgress.query.filter_by(user_id=user_id).first()
 
     # Calcular estadísticas basadas en UserHabit

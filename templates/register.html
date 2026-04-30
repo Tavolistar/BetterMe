@@ -43,29 +43,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Selección de hábitos diarios -->
-                                    <div class="form-group">
-                                        <label class="small font-weight-bold text-primary">
-                                            <i class="fas fa-check-circle"></i> Selecciona tus hábitos diarios:
-                                        </label>
-                                        <div class="border rounded p-3 bg-light">
-                                            {% for habit in habits %}
-                                            <div class="custom-control custom-checkbox mb-2">
-                                                <input type="checkbox" class="custom-control-input"
-                                                       name="habits" value="{{ habit.id }}"
-                                                       id="habit_{{ habit.id }}" checked>
-                                                <label class="custom-control-label" for="habit_{{ habit.id }}">
-                                                    <strong>{{ habit.name }}</strong>
-                                                    <small class="text-muted"> — {{ habit.description }} (+{{ habit.coins }} <i class="fas fa-coins"></i>)</small>
-                                                </label>
-                                            </div>
-                                            {% endfor %}
-                                            <small class="text-muted d-block mt-2">
-                                                <i class="fas fa-info-circle"></i> Puedes desmarcar los que no quieras. Siempre podrás cambiarlos después desde el dashboard.
-                                            </small>
-                                        </div>
-                                    </div>
-
                                     <button type="submit" class="btn btn-primary btn-user btn-block">
                                         <i class="fas fa-user-plus"></i> Registrarse
                                     </button>

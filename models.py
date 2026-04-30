@@ -43,17 +43,23 @@ class Task(db.Model):
 
 
 class Habit(db.Model):
-    """Modelo de hábitos predefinidos (globales/compartidos)."""
+    """Modelo de hábitos.
+    
+    - Hábitos predefinidos (globales): is_custom=False, user_id=None
+    - Hábitos personalizados (creados por usuario): is_custom=True, user_id=<id>
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200))
+    description = db.Column(db.String(200), nullable=True)
     coins = db.Column(db.Integer, default=5)
+    is_custom = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
 
     # Relación con el progreso por usuario
     user_habits = db.relationship('UserHabit', backref='habit', lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
-        return f'<Habit {self.id}: {self.name}>'
+        return f'<Habit {self.id}: {self.name} custom={self.is_custom}>'
 
 
 class UserHabit(db.Model):

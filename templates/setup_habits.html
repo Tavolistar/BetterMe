@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Configurar Hábitos{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12 col-md-9">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-5 d-none d-lg-block bg-setup-image"></div>
+                        <div class="col-lg-7">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-2">
+                                        <i class="fas fa-check-double text-primary"></i> Configura tus Hábitos Diarios
+                                    </h1>
+                                    <p class="mb-4 text-muted">
+                                        Selecciona los hábitos que quieres seguir o crea los tuyos propios.
+                                        <br><small>Puedes modificarlos en cualquier momento desde el dashboard.</small>
+                                    </p>
+                                </div>
+
+                                <form method="POST" action="{{ url_for('setup_habits') }}" id="habitsForm">
+                                    <!-- Hábitos predefinidos -->
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-primary">
+                                            <i class="fas fa-star"></i> Hábitos sugeridos:
+                                        </label>
+                                        <div class="border rounded p-3 bg-light">
+                                            {% for habit in habits %}
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input"
+                                                       name="habits" value="{{ habit.id }}"
+                                                       id="habit_{{ habit.id }}"
+                                                       {% if habit.id in selected_ids %}checked{% endif %}>
+                                                <label class="custom-control-label" for="habit_{{ habit.id }}">
+                                                    <strong>{{ habit.name }}</strong>
+                                                    <small class="text-muted"> — {{ habit.description }} (+{{ habit.coins }} <i class="fas fa-coins"></i>)</small>
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Hábitos personalizados -->
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-success">
+                                            <i class="fas fa-pen"></i> Tus propios hábitos:
+                                        </label>
+                                        <div id="customHabitsContainer">
+                                            {% if custom_habits %}
+                                                {% for ch in custom_habits %}
+                                                <div class="custom-habit-row border rounded p-2 mb-2 bg-white">
+                                                    <div class="form-row align-items-center">
+                                                        <div class="col-md-5 mb-2 mb-md-0">
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                   name="custom_habit_name" value="{{ ch.name }}"
+                                                                   placeholder="Nombre del hábito">
+                                                        </div>
+                                                        <div class="col-md-4 mb-2 mb-md-0">
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                   name="custom_habit_desc" value="{{ ch.description or '' }}"
+                                                                   placeholder="Descripción (opcional)">
+                                                        </div>
+                                                        <div class="col-md-2 mb-2 mb-md-0">
+                                                            <input type="number" class="form-control form-control-sm"
+                                                                   name="custom_habit_coins" value="{{ ch.coins }}"
+                                                                   placeholder="Monedas" min="1" max="100">
+                                                        </div>
+                                                        <div class="col-md-1">
+                                                            <button type="button" class="btn btn-sm btn-outline-danger remove-habit-btn"
+                                                                    onclick="this.closest('.custom-habit-row').remove()">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                            <div class="custom-habit-row border rounded p-2 mb-2 bg-white">
+                                                <div class="form-row align-items-center">
+                                                    <div class="col-md-5 mb-2 mb-md-0">
+                                                        <input type="text" class="form-control form-control-sm"
+                                                               name="custom_habit_name" placeholder="Ej: Meditar 10 min">
+                                                    </div>
+                                                    <div class="col-md-4 mb-2 mb-md-0">
+                                                        <input type="text" class="form-control form-control-sm"
+                                                               name="custom_habit_desc" placeholder="Descripción (opcional)">
+                                                    </div>
+                                                    <div class="col-md-2 mb-2 mb-md-0">
+                                                        <input type="number" class="form-control form-control-sm"
+                                                               name="custom_habit_coins" value="5"
+                                                               placeholder="Monedas" min="1" max="100">
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-habit-btn"
+                                                                onclick="this.closest('.custom-habit-row').remove()">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="addCustomHabit()">
+                                            <i class="fas fa-plus"></i> Agregar otro hábito
+                                        </button>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        <i class="fas fa-check"></i> Guardar mis hábitos
+                                    </button>
+                                </form>
+
+                                <hr>
+                                <div class="text-center">
+                                    <a class="small" href="{{ url_for('dashboard') }}">
+                                        <i class="fas fa-arrow-left"></i> Ir al dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .bg-setup-image {
+        background: url("{{ url_for('static', filename='img/undraw_rocket.svg') }}");
+        background-position: center;
+        background-size: cover;
+    }
+    .custom-habit-row {
+        transition: all 0.2s ease;
+    }
+    .custom-habit-row:hover {
+        border-color: #1cc88a !important;
+    }
+    .remove-habit-btn {
+        padding: 0.15rem 0.4rem;
+    }
+</style>
+<script>
+function addCustomHabit() {
+    const container = document.getElementById('customHabitsContainer');
+    const row = document.createElement('div');
+    row.className = 'custom-habit-row border rounded p-2 mb-2 bg-white';
+    row.innerHTML = `
+        <div class="form-row align-items-center">
+            <div class="col-md-5 mb-2 mb-md-0">
+                <input type="text" class="form-control form-control-sm"
+                       name="custom_habit_name" placeholder="Nombre del hábito">
+            </div>
+            <div class="col-md-4 mb-2 mb-md-0">
+                <input type="text" class="form-control form-control-sm"
+                       name="custom_habit_desc" placeholder="Descripción (opcional)">
+            </div>
+            <div class="col-md-2 mb-2 mb-md-0">
+                <input type="number" class="form-control form-control-sm"
+                       name="custom_habit_coins" value="5"
+                       placeholder="Monedas" min="1" max="100">
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-sm btn-outline-danger remove-habit-btn"
+                        onclick="this.closest('.custom-habit-row').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    container.appendChild(row);
+}
+</script>
+{% endblock %}
