@@ -587,6 +587,42 @@ def api_habit_stats():
     })
 
 
+@app.route("/api/coin_stats")
+@login_required
+def api_coin_stats():
+    """Devuelve datos JSON para la gráfica de monedas a través del tiempo (últimos 14 días)."""
+    user_id = session['user_id']
+    days = request.args.get('days', 14, type=int)
+    days = max(7, min(days, 30))
+
+    today = date.today()
+    dates = [today - timedelta(days=i) for i in range(days - 1, -1, -1)]
+
+    labels = []
+    data = []
+    balance = 100  # saldo inicial
+
+    for d in dates:
+        label = d.strftime('%d/%m')
+        labels.append(label)
+
+        # Sumar transacciones de ese día
+        day_transactions = CoinTransaction.query.filter(
+            CoinTransaction.user_id == user_id,
+            db.func.date(CoinTransaction.created_at) == d
+        ).all()
+
+        for tx in day_transactions:
+            balance += tx.amount
+
+        data.append(balance)
+
+    return jsonify({
+        'labels': labels,
+        'data': data
+    })
+
+
 @app.route("/toggle_habit/<int:habit_id>")
 @login_required
 def toggle_habit(habit_id):

@@ -184,3 +184,77 @@ function loadHabitChart() {
         })
         .catch(error => console.error('Error al cargar gráfica:', error));
 }
+
+// Gráfica de evolución de monedas a través del tiempo
+function loadCoinChart() {
+    const canvas = document.getElementById('coinChart');
+    if (!canvas) return;
+
+    fetch('/api/coin_stats')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = canvas.getContext('2d');
+
+            // Destruir gráfica anterior si existe
+            if (window.coinChartInstance) {
+                window.coinChartInstance.destroy();
+            }
+
+            window.coinChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Monedas',
+                        data: data.data,
+                        backgroundColor: 'rgba(246, 194, 62, 0.2)',
+                        borderColor: 'rgba(246, 194, 62, 1)',
+                        pointBackgroundColor: 'rgba(246, 194, 62, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: 'rgba(246, 194, 62, 1)',
+                        pointHoverBorderColor: '#fff',
+                        pointHitRadius: 10,
+                        pointBorderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' 🪙';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' monedas';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error al cargar gráfica de monedas:', error));
+}

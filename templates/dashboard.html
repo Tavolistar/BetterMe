@@ -423,6 +423,20 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Gráfica de monedas -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-warning">
+                                    <i class="fas fa-coins"></i> Evolución de Monedas (últimos 14 días)
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="coinChart"></canvas>
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">Saldo de monedas a través del tiempo</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -499,6 +513,14 @@ function confirmDeleteHabit(habitId, habitName) {
         form.submit();
     }
 }
+
+// Cargar gráficas cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        if (typeof loadHabitChart === 'function') loadHabitChart();
+        if (typeof loadCoinChart === 'function') loadCoinChart();
+    }, 500);
+});
 </script>
 
 {% endblock %}
