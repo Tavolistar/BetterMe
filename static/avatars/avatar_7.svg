@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bg7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a"/>
+      <stop offset="100%" style="stop-color:#fee140"/>
+    </linearGradient>
+  </defs>
+  <!-- Fondo -->
+  <circle cx="100" cy="100" r="98" fill="url(#bg7)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#fff" stroke-width="2"/>
+  <!-- Cuerpo (blusa) -->
+  <path d="M58 158 Q58 128 70 118 L130 118 Q142 128 142 158" fill="#e84393" opacity="0.9"/>
+  <path d="M70 118 L100 128 L130 118" fill="#d63384" opacity="0.5"/>
+  <!-- Cuello -->
+  <rect x="88" y="106" width="24" height="14" rx="4" fill="#d4a574"/>
+  <!-- Cabeza -->
+  <circle cx="100" cy="78" r="36" fill="#d4a574"/>
+  <!-- Pelo (corto, rojizo) -->
+  <path d="M64 72 Q64 38 100 35 Q136 38 136 72 L136 64 Q136 36 100 32 Q64 36 64 64 Z" fill="#c0392b"/>
+  <path d="M64 64 Q64 50 82 44 Q72 54 68 66 Z" fill="#c0392b"/>
+  <path d="M136 64 Q136 50 118 44 Q128 54 132 66 Z" fill="#c0392b"/>
+  <!-- Flequillo -->
+  <path d="M72 58 Q80 52 90 56 Q95 50 100 54 Q105 50 110 56 Q120 52 128 58" fill="none" stroke="#a93226" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Cejas -->
+  <path d="M76 70 Q82 66 90 70" fill="none" stroke="#7b241c" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M110 70 Q118 66 124 70" fill="none" stroke="#7b241c" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Ojos -->
+  <ellipse cx="84" cy="78" rx="5" ry="6" fill="#fff"/>
+  <ellipse cx="116" cy="78" rx="5" ry="6" fill="#fff"/>
+  <circle cx="85" cy="78" r="3.5" fill="#2c3e50"/>
+  <circle cx="117" cy="78" r="3.5" fill="#2c3e50"/>
+  <circle cx="86" cy="77" r="1.2" fill="#fff"/>
+  <circle cx="118" cy="77" r="1.2" fill="#fff"/>
+  <!-- Pestañas -->
+  <path d="M79 73 L77 70" stroke="#7b241c" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M89 73 L91 70" stroke="#7b241c" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M111 73 L109 70" stroke="#7b241c" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M121 73 L123 70" stroke="#7b241c" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Nariz -->
+  <path d="M98 82 Q100 87 102 82" fill="none" stroke="#c49a6c" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Sonrisa -->
+  <path d="M88 92 Q100 100 112 92" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+  <!-- Orejas -->
+  <ellipse cx="62" cy="78" rx="4" ry="7" fill="#d4a574"/>
+  <ellipse cx="138" cy="78" rx="4" ry="7" fill="#d4a574"/>
+  <!-- Lunar -->
+  <circle cx="108" cy="86" r="1.5" fill="#8d6e63" opacity="0.5"/>
+</svg>

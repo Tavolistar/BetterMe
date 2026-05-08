@@ -21,6 +21,18 @@
                 <span>Dashboard</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('shop') }}">
+                <i class="fas fa-fw fa-store"></i>
+                <span>Tienda</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('coin_history') }}">
+                <i class="fas fa-fw fa-history"></i>
+                <span>Historial</span>
+            </a>
+        </li>
         <li class="nav-item active">
             <a class="nav-link" href="{{ url_for('avatars') }}">
                 <i class="fas fa-fw fa-user-circle"></i>
@@ -46,15 +58,16 @@
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-toggle="dropdown">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Usuario</span>
-                            <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.user_name }}</span>
+                            <img class="img-profile rounded-circle" src="{{ url_for('static', filename='avatars/' ~ current_avatar) if current_avatar.startswith('avatar_') else url_for('static', filename='img/' ~ current_avatar) }}"
+                                 onerror="this.src='{{ url_for('static', filename='img/undraw_profile.svg') }}'">
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow">
                             <a class="dropdown-item" href="{{ url_for('index') }}">
                                 <i class="fas fa-home fa-sm fa-fw mr-2"></i> Inicio
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ url_for('login') }}">
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i> Cerrar Sesión
                             </a>
                         </div>
@@ -65,29 +78,134 @@
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
-                <h1 class="h3 mb-4 text-gray-800">
-                    <i class="fas fa-user-circle"></i> Galería de Avatares
-                </h1>
-                <p class="mb-4">Selecciona un avatar para personalizar tu perfil.</p>
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-user-circle"></i> Galería de Avatares
+                    </h1>
+                    <div>
+                        <span class="mr-3 font-weight-bold text-gray-800">
+                            <i class="fas fa-coins text-warning"></i> {{ coins }} monedas
+                        </span>
+                    </div>
+                </div>
 
-                <div class="row">
-                    {% for i in range(1, 7) %}
-                    <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="card shadow text-center">
-                            <div class="card-body py-4">
-                                <img class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;"
-                                     src="{{ url_for('static', filename='avatars/avatar_' ~ i ~ '.png') }}"
-                                     alt="Avatar {{ i }}"
-                                     onerror="this.src='{{ url_for('static', filename='img/undraw_profile.svg') }}'">
-                                <h5 class="card-title">Avatar {{ i }}</h5>
-                                <button class="btn btn-primary btn-sm" onclick="alert('Avatar {{ i }} seleccionado')">
-                                    <i class="fas fa-check"></i> Seleccionar
-                                </button>
+                <!-- AVATARES GRATUITOS -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-star"></i> Avatares Gratuitos
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for avatar in avatars %}
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                <div class="card shadow text-center h-100 {% if current_avatar == avatar.file %}border-success border-2{% endif %}">
+                                    <div class="card-body py-3">
+                                        <div class="position-relative d-inline-block">
+                                            <img class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid {% if current_avatar == avatar.file %}#1cc88a{% else %}#e3e6f0{% endif %};"
+                                                 src="{{ url_for('static', filename='avatars/' ~ avatar.file) }}"
+                                                 alt="{{ avatar.name }}"
+                                                 onerror="this.src='{{ url_for('static', filename='img/undraw_profile.svg') }}'">
+                                            {% if current_avatar == avatar.file %}
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="font-size: 0.7rem;">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            {% endif %}
+                                            {% if avatar.gender == 'M' %}
+                                            <span class="position-absolute top-0 start-0 badge bg-info" style="font-size: 0.6rem;">♂</span>
+                                            {% else %}
+                                            <span class="position-absolute top-0 start-0 badge bg-danger" style="font-size: 0.6rem;">♀</span>
+                                            {% endif %}
+                                        </div>
+                                        <h6 class="card-title mb-1">{{ avatar.name }}</h6>
+                                        <small class="text-muted d-block mb-2">{{ avatar.description }}</small>
+                                        {% if current_avatar == avatar.file %}
+                                        <button class="btn btn-success btn-sm" disabled>
+                                            <i class="fas fa-check"></i> Seleccionado
+                                        </button>
+                                        {% else %}
+                                        <a href="{{ url_for('select_avatar', avatar_file=avatar.file) }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-check"></i> Seleccionar
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
+
+                <!-- AVATARES DE LA TIENDA (desbloqueables) -->
+                {% if shop_avatars %}
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-warning">
+                            <i class="fas fa-lock"></i> Avatares de la Tienda (desbloqueables con monedas)
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for item in shop_avatars %}
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                <div class="card shadow text-center h-100 {% if item.id in purchased_ids %}border-success{% endif %}">
+                                    <div class="card-body py-3">
+                                        <div class="position-relative d-inline-block">
+                                            {% if item.image and item.image.endswith('.svg') %}
+                                            <img class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #e3e6f0; filter: {% if item.id not in purchased_ids %}grayscale(0.8){% endif %};"
+                                                 src="{{ url_for('static', filename='avatars/' ~ item.image) }}"
+                                                 alt="{{ item.name }}"
+                                                 onerror="this.src='{{ url_for('static', filename='img/undraw_profile.svg') }}'">
+                                            {% else %}
+                                            <i class="fas fa-user-circle fa-5x text-secondary mb-2"></i>
+                                            {% endif %}
+                                            {% if item.id in purchased_ids %}
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="font-size: 0.7rem;">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <h6 class="card-title mb-1">{{ item.name }}</h6>
+                                        <small class="text-muted d-block mb-2">{{ item.description }}</small>
+                                        <div class="mb-2">
+                                            <span class="badge badge-warning">
+                                                <i class="fas fa-coins"></i> {{ item.price }}
+                                            </span>
+                                        </div>
+                                        {% if item.id in purchased_ids %}
+                                            {% if current_avatar == item.image %}
+                                            <button class="btn btn-success btn-sm" disabled>
+                                                <i class="fas fa-check"></i> Seleccionado
+                                            </button>
+                                            {% else %}
+                                            <a href="{{ url_for('select_avatar', avatar_file=item.image) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-check"></i> Usar
+                                            </a>
+                                            {% endif %}
+                                        {% else %}
+                                        <a href="{{ url_for('buy_item', item_id=item.id) }}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-shopping-cart"></i> Comprar
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('shop') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-store"></i> Ir a la Tienda
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-tachometer-alt"></i> Volver al Dashboard
+                    </a>
+                </div>
+
             </div>
         </div>
 
@@ -101,12 +219,9 @@
         </footer>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Si no hay imágenes de avatar reales, se mostrará el SVG por defecto (onerror)
-    });
-</script>
+<style>
+.border-2 { border-width: 3px !important; }
+.card .position-relative .badge { font-size: 0.65rem !important; }
+</style>
 {% endblock %}

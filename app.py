@@ -273,9 +273,65 @@ def index():
 
 
 @app.route("/avatars")
+@login_required
 def avatars():
-    """Galería de avatares."""
-    return render_template("avatars.html")
+    """AV-02: Galería de avatares. Muestra los disponibles y los bloqueados."""
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+
+    # Lista de avatares disponibles (SVG reales)
+    avatar_list = [
+        {'id': 1, 'file': 'avatar_1.svg', 'name': 'Carlos', 'gender': 'M', 'description': 'Ejecutivo moderno', 'price': 0},
+        {'id': 2, 'file': 'avatar_2.svg', 'name': 'Valentina', 'gender': 'F', 'description': 'Chica con estilo', 'price': 0},
+        {'id': 3, 'file': 'avatar_3.svg', 'name': 'Marcus', 'gender': 'M', 'description': 'Deportista urbano', 'price': 0},
+        {'id': 4, 'file': 'avatar_4.svg', 'name': 'Sofía', 'gender': 'F', 'description': 'Chica golden', 'price': 0},
+        {'id': 5, 'file': 'avatar_5.svg', 'name': 'Don Alberto', 'gender': 'M', 'description': 'Caballero formal', 'price': 0},
+        {'id': 6, 'file': 'avatar_6.svg', 'name': 'Lucía', 'gender': 'F', 'description': 'Chica deportista', 'price': 0},
+        {'id': 7, 'file': 'avatar_7.svg', 'name': 'Camila', 'gender': 'F', 'description': 'Chica pelirroja', 'price': 0},
+        {'id': 8, 'file': 'avatar_8.svg', 'name': 'Mateo', 'gender': 'M', 'description': 'Joven con gorra', 'price': 0},
+    ]
+
+    # Avatars de la tienda (desbloqueables con monedas)
+    shop_avatars = ShopItem.query.filter_by(category='avatar').all()
+    purchased_ids = set()
+    if user_id:
+        purchases = UserPurchase.query.filter_by(user_id=user_id).all()
+        purchased_ids = {p.item_id for p in purchases}
+
+    # Avatar actual del usuario
+    current_avatar = user.avatar if user else 'undraw_profile.svg'
+
+    return render_template("avatars.html",
+                           avatars=avatar_list,
+                           shop_avatars=shop_avatars,
+                           purchased_ids=purchased_ids,
+                           current_avatar=current_avatar,
+                           coins=progress.coins if progress else 0)
+
+
+@app.route("/select_avatar/<path:avatar_file>")
+@login_required
+def select_avatar(avatar_file):
+    """AV-02: Cambiar el avatar del usuario."""
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    # Validar que el archivo existe en static/avatars/
+    import os
+    avatar_path = os.path.join(app.root_path, 'static', 'avatars', avatar_file)
+    if not os.path.exists(avatar_path):
+        flash('El avatar no existe.', 'danger')
+        return redirect(url_for('avatars'))
+
+    user.avatar = avatar_file
+    db.session.commit()
+
+    # Actualizar sesión
+    session['user_avatar'] = avatar_file
+
+    flash(f'✅ ¡Avatar actualizado!', 'success')
+    return redirect(url_for('dashboard'))
 
 
 # ─── Onboarding: Configuración inicial de hábitos ────────────────────
@@ -851,18 +907,23 @@ def buy_item(item_id):
 # ====== SEMILLA DE PRODUCTOS PARA LA TIENDA ======
 @app.route("/seed_shop")
 def seed_shop():
-    """Poblar la tienda con productos iniciales (solo ejecutar una vez)."""
-    if ShopItem.query.count() > 0:
-        flash('La tienda ya tiene productos.', 'info')
-        return redirect(url_for('shop'))
+    """Poblar la tienda con productos iniciales (reemplaza productos existentes)."""
+    # Eliminar productos existentes y sus compras asociadas (para re-poblar)
+    UserPurchase.query.delete()
+    ShopItem.query.delete()
+    db.session.commit()
 
     products = [
-        ShopItem(name="Avatar Ninja", description="Un avatar con estilo ninja sigiloso.", price=50, category="avatar", image="avatar_ninja.png"),
-        ShopItem(name="Avatar Astronauta", description="Explora el espacio con este avatar.", price=80, category="avatar", image="avatar_astronauta.png"),
-        ShopItem(name="Avatar Vikingo", description="Un guerrero vikingo para tu perfil.", price=70, category="avatar", image="avatar_vikingo.png"),
-        ShopItem(name="Avatar Robot", description="Un avatar robótico de última generación.", price=100, category="avatar", image="avatar_robot.png"),
-        ShopItem(name="Avatar Mago", description="Poderes mágicos para tu personaje.", price=90, category="avatar", image="avatar_mago.png"),
-        ShopItem(name="Avatar Pirata", description="¡Al abordaje! Un avatar pirata.", price=60, category="avatar", image="avatar_pirata.png"),
+        # AV-03: Avatares desbloqueables con monedas (SVGs reales)
+        ShopItem(name="Avatar Ejecutivo", description="Carlos - Estilo ejecutivo moderno.", price=50, category="avatar", image="avatar_1.svg"),
+        ShopItem(name="Avatar Valentina", description="Valentina - Chica con estilo.", price=50, category="avatar", image="avatar_2.svg"),
+        ShopItem(name="Avatar Marcus", description="Marcus - Deportista urbano.", price=50, category="avatar", image="avatar_3.svg"),
+        ShopItem(name="Avatar Sofía", description="Sofía - Chica golden elegante.", price=50, category="avatar", image="avatar_4.svg"),
+        ShopItem(name="Avatar Don Alberto", description="Don Alberto - Caballero formal.", price=50, category="avatar", image="avatar_5.svg"),
+        ShopItem(name="Avatar Lucía", description="Lucía - Chica deportista.", price=50, category="avatar", image="avatar_6.svg"),
+        ShopItem(name="Avatar Camila", description="Camila - Chica pelirroja.", price=50, category="avatar", image="avatar_7.svg"),
+        ShopItem(name="Avatar Mateo", description="Mateo - Joven con gorra.", price=50, category="avatar", image="avatar_8.svg"),
+        # Otros productos
         ShopItem(name="Tema Oscuro", description="Activa el modo oscuro en tu dashboard.", price=120, category="theme", image=None),
         ShopItem(name="Fondo Estelar", description="Fondo espacial para tu perfil.", price=40, category="background", image=None),
         ShopItem(name="Ícono Especial", description="Un ícono exclusivo para tus hábitos.", price=30, category="icon", image=None),
@@ -873,7 +934,7 @@ def seed_shop():
         db.session.add(p)
     db.session.commit()
 
-    flash('🎉 ¡Tienda poblada con 10 productos!', 'success')
+    flash('🎉 ¡Tienda poblada con 12 productos!', 'success')
     return redirect(url_for('shop'))
 
 

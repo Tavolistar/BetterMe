@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a18cd1"/>
+      <stop offset="100%" style="stop-color:#fbc2eb"/>
+    </linearGradient>
+  </defs>
+  <!-- Fondo -->
+  <circle cx="100" cy="100" r="98" fill="url(#bg4)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#fff" stroke-width="2"/>
+  <!-- Cuerpo (vestido) -->
+  <path d="M56 156 Q56 126 68 116 L132 116 Q144 126 144 156" fill="#9b59b6" opacity="0.9"/>
+  <path d="M68 116 L100 128 L132 116" fill="#8e44ad" opacity="0.5"/>
+  <path d="M80 140 L100 155 L120 140" fill="#8e44ad" opacity="0.3"/>
+  <!-- Cuello -->
+  <rect x="88" y="106" width="24" height="14" rx="4" fill="#f0c8a0"/>
+  <!-- Cabeza -->
+  <circle cx="100" cy="78" r="36" fill="#f0c8a0"/>
+  <!-- Pelo largo (rubio, ondulado) -->
+  <path d="M64 70 Q64 36 100 33 Q136 36 136 70 L136 82 Q136 115 118 125 L114 120 Q128 102 128 78 Z" fill="#f1c40f"/>
+  <path d="M64 70 Q64 82 82 125 L86 120 Q72 102 72 78 Z" fill="#f1c40f"/>
+  <path d="M64 66 Q64 38 100 34 Q136 38 136 66 L136 60 Q136 34 100 30 Q64 34 64 60 Z" fill="#f1c40f"/>
+  <!-- Onda en el pelo -->
+  <path d="M72 50 Q80 55 76 62" fill="none" stroke="#d4a017" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M124 50 Q120 55 124 62" fill="none" stroke="#d4a017" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Cejas -->
+  <path d="M76 70 Q82 66 90 70" fill="none" stroke="#8b6914" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M110 70 Q118 66 124 70" fill="none" stroke="#8b6914" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Ojos -->
+  <ellipse cx="84" cy="78" rx="5" ry="6" fill="#fff"/>
+  <ellipse cx="116" cy="78" rx="5" ry="6" fill="#fff"/>
+  <circle cx="85" cy="78" r="3.5" fill="#2c3e50"/>
+  <circle cx="117" cy="78" r="3.5" fill="#2c3e50"/>
+  <circle cx="86" cy="77" r="1.2" fill="#fff"/>
+  <circle cx="118" cy="77" r="1.2" fill="#fff"/>
+  <!-- Pestañas -->
+  <path d="M79 73 L77 70" stroke="#8b6914" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M89 73 L91 70" stroke="#8b6914" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M111 73 L109 70" stroke="#8b6914" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M121 73 L123 70" stroke="#8b6914" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Nariz -->
+  <path d="M98 82 Q100 87 102 82" fill="none" stroke="#e0a97a" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Sonrisa -->
+  <path d="M88 92 Q100 100 112 92" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+  <!-- Orejas -->
+  <ellipse cx="62" cy="78" rx="4" ry="7" fill="#f0c8a0"/>
+  <ellipse cx="138" cy="78" rx="4" ry="7" fill="#f0c8a0"/>
+  <!-- Pendientes de aro -->
+  <circle cx="62" cy="86" r="3" fill="none" stroke="#f1c40f" stroke-width="1.5"/>
+  <circle cx="138" cy="86" r="3" fill="none" stroke="#f1c40f" stroke-width="1.5"/>
+</svg>

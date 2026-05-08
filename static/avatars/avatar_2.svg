@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb"/>
+      <stop offset="100%" style="stop-color:#f5576c"/>
+    </linearGradient>
+  </defs>
+  <!-- Fondo -->
+  <circle cx="100" cy="100" r="98" fill="url(#bg2)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#fff" stroke-width="2"/>
+  <!-- Cuerpo (blusa femenina) -->
+  <path d="M58 158 Q58 128 70 118 L130 118 Q142 128 142 158" fill="#e74c3c" opacity="0.9"/>
+  <path d="M70 118 L100 128 L130 118" fill="#c0392b" opacity="0.5"/>
+  <!-- Cuello -->
+  <rect x="88" y="106" width="24" height="16" rx="4" fill="#f8c291"/>
+  <!-- Cabeza -->
+  <circle cx="100" cy="78" r="36" fill="#f8c291"/>
+  <!-- Pelo largo (negro) -->
+  <path d="M64 72 Q64 38 100 35 Q136 38 136 72 L136 85 Q136 110 120 120 L115 115 Q128 100 128 80 Z" fill="#1a1a2e"/>
+  <path d="M64 72 Q64 85 80 120 L85 115 Q72 100 72 80 Z" fill="#1a1a2e"/>
+  <path d="M64 68 Q64 40 100 36 Q136 40 136 68 L136 62 Q136 36 100 32 Q64 36 64 62 Z" fill="#1a1a2e"/>
+  <!-- Cejas -->
+  <path d="M76 70 Q82 66 90 70" fill="none" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/>
+  <path d="M110 70 Q118 66 124 70" fill="none" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/>
+  <!-- Ojos -->
+  <ellipse cx="84" cy="78" rx="5" ry="6" fill="#fff"/>
+  <ellipse cx="116" cy="78" rx="5" ry="6" fill="#fff"/>
+  <circle cx="85" cy="78" r="3.5" fill="#2c3e50"/>
+  <circle cx="117" cy="78" r="3.5" fill="#2c3e50"/>
+  <circle cx="86" cy="77" r="1.2" fill="#fff"/>
+  <circle cx="118" cy="77" r="1.2" fill="#fff"/>
+  <!-- Pestañas -->
+  <path d="M79 74 L77 71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M89 74 L91 71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M111 74 L109 71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M121 74 L123 71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Nariz -->
+  <path d="M98 82 Q100 88 102 82" fill="none" stroke="#e3a87c" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Sonrisa -->
+  <path d="M88 92 Q100 102 112 92" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+  <!-- Orejas -->
+  <ellipse cx="62" cy="78" rx="4" ry="7" fill="#f8c291"/>
+  <ellipse cx="138" cy="78" rx="4" ry="7" fill="#f8c291"/>
+  <!-- Pendientes -->
+  <circle cx="62" cy="86" r="2.5" fill="#f1c40f"/>
+  <circle cx="138" cy="86" r="2.5" fill="#f1c40f"/>
+</svg>
