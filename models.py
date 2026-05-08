@@ -94,3 +94,22 @@ class UserProgress(db.Model):
 
     def __repr__(self):
         return f'<UserProgress user={self.user_id}: {self.coins} coins, {self.streak} streak>'
+
+
+class HabitLog(db.Model):
+    """Registro diario de cumplimiento de hábitos para gráficas e historial."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    habit_id = db.Column(db.Integer, db.ForeignKey('habit.id'), nullable=False, index=True)
+    date = db.Column(db.Date, nullable=False, default=date.today)
+    completed = db.Column(db.Boolean, default=False)
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'habit_id', 'date', name='uq_user_habit_date'),
+    )
+
+    user = db.relationship('User', backref=db.backref('habit_logs', lazy='dynamic'))
+    habit = db.relationship('Habit', backref=db.backref('habit_logs', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<HabitLog user={self.user_id} habit={self.habit_id} date={self.date} completed={self.completed}>'

@@ -210,6 +210,10 @@
                                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                                          aria-labelledby="dropdownMenuLink">
                                         <div class="dropdown-header">Opciones:</div>
+                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#createHabitModal">
+                                            <i class="fas fa-plus-circle fa-sm fa-fw mr-2"></i>Crear nuevo hábito
+                                        </a>
+                                        <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="{{ url_for('setup_habits') }}">
                                             <i class="fas fa-cog fa-sm fa-fw mr-2"></i>Gestionar hábitos
                                         </a>
@@ -243,10 +247,15 @@
                                 </form>
 
                                 <!-- Hábitos predefinidos (por usuario) -->
-                                <h6 class="mb-3">🏆 Hábitos Diarios (Haz click para marcar/desmarcar):</h6>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">🏆 Hábitos Diarios (Haz click para marcar/desmarcar):</h6>
+                                    <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#createHabitModal">
+                                        <i class="fas fa-plus"></i> Nuevo hábito
+                                    </button>
+                                </div>
                                 <div class="row mb-4">
                                     {% for item in user_habits_data %}
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <div class="card border-secondary task-card {% if item.user_habit.completed %}border-success bg-light{% endif %}"
                                              onclick="toggleHabit({{ item.habit.id }})">
                                             <div class="card-body py-2">
@@ -258,9 +267,23 @@
                                                             {{ item.habit.name }}
                                                         </label>
                                                     </div>
-                                                    <span class="badge badge-warning">
-                                                        +{{ item.habit.coins }} <i class="fas fa-coins"></i>
-                                                    </span>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge badge-warning mr-2">
+                                                            +{{ item.habit.coins }} <i class="fas fa-coins"></i>
+                                                        </span>
+                                                        {% if item.habit.is_custom %}
+                                                        <div class="btn-group btn-group-sm" onclick="event.stopPropagation()">
+                                                            <button class="btn btn-outline-info btn-sm" title="Editar"
+                                                                    onclick="$('#editHabitModal{{ item.habit.id }}').modal('show')">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-sm" title="Eliminar"
+                                                                    onclick="confirmDeleteHabit({{ item.habit.id }}, '{{ item.habit.name }}')">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
                                                 {% if item.habit.description %}
                                                 <small class="text-muted d-block mt-1">{{ item.habit.description }}</small>
@@ -268,6 +291,43 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Modal Editar Hábito -->
+                                    {% if item.habit.is_custom %}
+                                    <div class="modal fade" id="editHabitModal{{ item.habit.id }}" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <form action="{{ url_for('edit_habit', habit_id=item.habit.id) }}" method="POST">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">✏️ Editar hábito</h5>
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <label>Nombre del hábito</label>
+                                                            <input type="text" class="form-control" name="name"
+                                                                   value="{{ item.habit.name }}" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Descripción</label>
+                                                            <input type="text" class="form-control" name="description"
+                                                                   value="{{ item.habit.description or '' }}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Monedas por completar</label>
+                                                            <input type="number" class="form-control" name="coins"
+                                                                   value="{{ item.habit.coins }}" min="1" max="100">
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
                                     {% endfor %}
                                 </div>
 
@@ -333,6 +393,19 @@
                                     </span>
                                 </div>
                             </div>
+                        <!-- Gráfica de cumplimiento -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-line"></i> Cumplimiento de Hábitos (últimos 7 días)
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="habitChart"></canvas>
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">Porcentaje de hábitos completados por día</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -363,4 +436,53 @@
 <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
 </a>
+
+<!-- Modal Crear Hábito -->
+<div class="modal fade" id="createHabitModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{ url_for('create_habit') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">🌱 Crear nuevo hábito</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nombre del hábito</label>
+                        <input type="text" class="form-control" name="name"
+                               placeholder="Ej: Meditar 10 minutos" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción (opcional)</label>
+                        <input type="text" class="form-control" name="description"
+                               placeholder="Ej: Sentarme en silencio y respirar profundamente">
+                    </div>
+                    <div class="form-group">
+                        <label>Monedas por completar</label>
+                        <input type="number" class="form-control" name="coins" value="5" min="1" max="100">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear hábito</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario oculto para eliminar hábito -->
+<form id="deleteHabitForm" method="POST" style="display:none;">
+</form>
+
+<script>
+function confirmDeleteHabit(habitId, habitName) {
+    if (confirm(`¿Estás seguro de eliminar el hábito "${habitName}"?`)) {
+        const form = document.getElementById('deleteHabitForm');
+        form.action = `/delete_habit/${habitId}`;
+        form.submit();
+    }
+}
+</script>
+
 {% endblock %}

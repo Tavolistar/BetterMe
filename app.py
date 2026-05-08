@@ -1,12 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from datetime import date
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from datetime import date, timedelta
 from functools import wraps
 import os
 import secrets
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 
-from models import db, User, Task, Habit, UserHabit, UserProgress
+from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog
 
 # Cargar variables de entorno
 load_dotenv()
@@ -417,32 +417,6 @@ def toggle_task(task_id):
     return redirect(url_for('dashboard'))
 
 
-@app.route("/toggle_habit/<int:habit_id>")
-@login_required
-def toggle_habit(habit_id):
-    user_id = session['user_id']
-
-    # Buscar o crear el UserHabit para este usuario y hábito
-    uh = UserHabit.query.filter_by(user_id=user_id, habit_id=habit_id).first()
-    if uh is None:
-        uh = UserHabit(user_id=user_id, habit_id=habit_id, completed=False)
-        db.session.add(uh)
-        db.session.flush()
-
-    uh.completed = not uh.completed
-    uh.completed_date = date.today() if uh.completed else None
-
-    habit = Habit.query.get_or_404(habit_id)
-    progress = UserProgress.query.filter_by(user_id=user_id).first()
-    if progress:
-        progress.update_streak()
-        if uh.completed:
-            progress.coins += habit.coins
-        else:
-            progress.coins = max(0, progress.coins - (habit.coins // 2))
-        db.session.commit()
-
-    return redirect(url_for('dashboard'))
 
 
 @app.route("/reset_day")
@@ -479,6 +453,181 @@ def add_sample_tasks():
         if not Task.query.filter_by(text=task_text, user_id=user_id).first():
             new_task = Task(text=task_text, user_id=user_id)
             db.session.add(new_task)
+
+    db.session.commit()
+    return redirect(url_for('dashboard'))
+
+
+# ─── CRUD de Hábitos ────────────────────────────────────────────────
+
+@app.route("/create_habit", methods=['POST'])
+@login_required
+def create_habit():
+    """HA-01: Crear un hábito personalizado desde el dashboard."""
+    user_id = session['user_id']
+    name = request.form.get('name', '').strip()
+    description = request.form.get('description', '').strip()
+    coins = request.form.get('coins', 5, type=int)
+
+    if not name:
+        flash('El nombre del hábito es obligatorio.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    # Crear el hábito
+    new_habit = Habit(
+        name=name,
+        description=description,
+        coins=max(1, min(coins, 100)),
+        is_custom=True,
+        user_id=user_id
+    )
+    db.session.add(new_habit)
+    db.session.flush()
+
+    # Asignarlo al usuario
+    uh = UserHabit(user_id=user_id, habit_id=new_habit.id, completed=False)
+    db.session.add(uh)
+    db.session.commit()
+
+    flash(f'✅ Hábito "{name}" creado correctamente.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route("/edit_habit/<int:habit_id>", methods=['POST'])
+@login_required
+def edit_habit(habit_id):
+    """HA-02: Editar un hábito existente."""
+    user_id = session['user_id']
+    habit = Habit.query.get_or_404(habit_id)
+
+    # Solo el dueño puede editar hábitos personalizados
+    if not habit.is_custom or habit.user_id != user_id:
+        flash('No puedes editar este hábito.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    name = request.form.get('name', '').strip()
+    description = request.form.get('description', '').strip()
+    coins = request.form.get('coins', 5, type=int)
+
+    if not name:
+        flash('El nombre del hábito es obligatorio.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    habit.name = name
+    habit.description = description
+    habit.coins = max(1, min(coins, 100))
+    db.session.commit()
+
+    flash(f'✅ Hábito "{name}" actualizado.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route("/delete_habit/<int:habit_id>", methods=['POST'])
+@login_required
+def delete_habit(habit_id):
+    """HA-03: Eliminar un hábito."""
+    user_id = session['user_id']
+    habit = Habit.query.get_or_404(habit_id)
+
+    # Solo el dueño puede eliminar hábitos personalizados
+    if not habit.is_custom or habit.user_id != user_id:
+        flash('No puedes eliminar este hábito.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    name = habit.name
+
+    # Eliminar relaciones
+    UserHabit.query.filter_by(user_id=user_id, habit_id=habit_id).delete()
+    HabitLog.query.filter_by(user_id=user_id, habit_id=habit_id).delete()
+    db.session.delete(habit)
+    db.session.commit()
+
+    flash(f'🗑️ Hábito "{name}" eliminado.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+# ─── API para gráfica de cumplimiento ──────────────────────────────
+
+@app.route("/api/habit_stats")
+@login_required
+def api_habit_stats():
+    """Devuelve datos JSON para la gráfica de cumplimiento (últimos 7 días)."""
+    user_id = session['user_id']
+    days = request.args.get('days', 7, type=int)
+    days = max(7, min(days, 30))
+
+    today = date.today()
+    dates = [today - timedelta(days=i) for i in range(days - 1, -1, -1)]
+
+    # Obtener hábitos del usuario
+    user_habits_data = get_user_habits(user_id)
+    total_habits = len(user_habits_data)
+
+    labels = []
+    data = []
+
+    for d in dates:
+        label = d.strftime('%d/%m')
+        labels.append(label)
+
+        if total_habits == 0:
+            data.append(0)
+        else:
+            # Contar cuántos hábitos se completaron en esa fecha
+            completed = HabitLog.query.filter_by(
+                user_id=user_id, date=d, completed=True
+            ).count()
+            percentage = int((completed / total_habits) * 100)
+            data.append(percentage)
+
+    return jsonify({
+        'labels': labels,
+        'data': data,
+        'total_habits': total_habits
+    })
+
+
+@app.route("/toggle_habit/<int:habit_id>")
+@login_required
+def toggle_habit(habit_id):
+    user_id = session['user_id']
+
+    # Buscar o crear el UserHabit para este usuario y hábito
+    uh = UserHabit.query.filter_by(user_id=user_id, habit_id=habit_id).first()
+    if uh is None:
+        uh = UserHabit(user_id=user_id, habit_id=habit_id, completed=False)
+        db.session.add(uh)
+        db.session.flush()
+
+    uh.completed = not uh.completed
+    uh.completed_date = date.today() if uh.completed else None
+
+    habit = Habit.query.get_or_404(habit_id)
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+    if progress:
+        progress.update_streak()
+        if uh.completed:
+            progress.coins += habit.coins
+        else:
+            progress.coins = max(0, progress.coins - (habit.coins // 2))
+        db.session.commit()
+
+    # Registrar en HabitLog para el histórico
+    today = date.today()
+    log = HabitLog.query.filter_by(
+        user_id=user_id, habit_id=habit_id, date=today
+    ).first()
+
+    if log:
+        log.completed = uh.completed
+    else:
+        log = HabitLog(
+            user_id=user_id,
+            habit_id=habit_id,
+            date=today,
+            completed=uh.completed
+        )
+        db.session.add(log)
 
     db.session.commit()
     return redirect(url_for('dashboard'))

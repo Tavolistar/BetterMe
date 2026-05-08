@@ -26,7 +26,7 @@ function addSampleTasks() {
     }
 }
 
-// Actualizar checkboxes visualmente
+// Inicialización al cargar el DOM
 document.addEventListener('DOMContentLoaded', function() {
     // Marcar checkboxes según estado
     const habitCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="habit"]');
@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Actualizar progreso visualmente
     updateProgressBars();
+
+    // Cargar gráfica de cumplimiento
+    setTimeout(loadHabitChart, 500);
 });
 
 // Actualizar barras de progreso
@@ -104,4 +107,80 @@ if (window.location.search.includes('coins=')) {
     if (newCoins) {
         showCoinNotification(newCoins);
     }
+}
+
+// ─── Gráfica de cumplimiento de hábitos ──────────────────────────
+
+function loadHabitChart() {
+    const canvas = document.getElementById('habitChart');
+    if (!canvas) return;
+
+    fetch('/api/habit_stats')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = canvas.getContext('2d');
+
+            // Destruir gráfica anterior si existe
+            if (window.habitChartInstance) {
+                window.habitChartInstance.destroy();
+            }
+
+            window.habitChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: '% Cumplimiento',
+                        data: data.data,
+                        backgroundColor: 'rgba(78, 115, 223, 0.2)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointHoverBorderColor: '#fff',
+                        pointHitRadius: 10,
+                        pointBorderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + '% completado';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error al cargar gráfica:', error));
 }

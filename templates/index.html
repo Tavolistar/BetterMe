@@ -1,89 +1,633 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="BetterMe - Tu compañero de hábitos diarios con gamificación">
+    <meta name="author" content="BetterMe">
+    <title>BetterMe - Tu compañero de hábitos diarios</title>
 
-{% block title %}BetterMe - Inicio{% endblock %}
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#4e73df',
+                    secondary: '#1cc88a',
+                    accent: '#f6c23e',
+                    surface: '#f8f9fc',
+                    text: '#5a5c69',
+                },
+                fontFamily: {
+                    nunito: ['Nunito', 'sans-serif'],
+                },
+                borderRadius: {
+                    'xl': '12px',
+                }
+            }
+        }
+    }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { font-family: 'Nunito', sans-serif; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; padding: 0; }
+        .gradient-hero {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        }
+        .gradient-cta {
+            background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(78, 115, 223, 0.15);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #4e73df;
+        }
+        .btn-primary {
+            background: #4e73df;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #224abe;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(78, 115, 223, 0.35);
+        }
+        .btn-outline {
+            border: 2px solid white;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background: white;
+            color: #4e73df;
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            font-size: 1.5rem;
+        }
+        .testimonial-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 4rem;
+            color: #4e73df;
+            opacity: 0.15;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        .demo-placeholder {
+            background: linear-gradient(135deg, #e8ecf4 0%, #d5dce8 100%);
+            border-radius: 16px;
+            border: 2px dashed #b0b9cc;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #7a8299;
+            text-align: center;
+            padding: 2rem;
+        }
+        .step-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin: 0 auto 1rem;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        .animate-fade-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .animate-fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
+        .animate-fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
+        .animate-fade-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
+    </style>
+</head>
+<body>
 
-{% block page_content %}
-<!-- Navegación simple -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary static-top">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-            <i class="fas fa-leaf"></i> BetterMe
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('login') }}">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+    <!-- ====== FLASH MESSAGES ====== -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="fixed top-4 right-4 z-[100] max-w-sm">
+                    <div class="bg-white rounded-lg shadow-xl border-l-4 
+                        {% if category == 'success' %}border-l-green-500
+                        {% elif category == 'danger' %}border-l-red-500
+                        {% elif category == 'warning' %}border-l-yellow-500
+                        {% else %}border-l-blue-500{% endif %} p-4 flex justify-between items-start">
+                        <p class="text-sm text-gray-700">{{ message }}</p>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ====== NAVBAR ====== -->
+    <nav class="fixed w-full z-50 gradient-hero shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="{{ url_for('index') }}" class="flex items-center space-x-2 text-white">
+                    <i class="fas fa-leaf text-2xl" style="color: #1cc88a;"></i>
+                    <span class="text-xl font-extrabold tracking-tight">BetterMe</span>
+                </a>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#como-funciona" class="text-white/90 hover:text-white transition text-sm font-semibold">¿Cómo funciona?</a>
+                    <a href="#funcionalidades" class="text-white/90 hover:text-white transition text-sm font-semibold">Funcionalidades</a>
+                    <a href="#testimonios" class="text-white/90 hover:text-white transition text-sm font-semibold">Testimonios</a>
+                    <a href="{{ url_for('login') }}" class="text-white/90 hover:text-white transition text-sm font-semibold">Iniciar sesión</a>
+                    <a href="{{ url_for('register') }}"
+                       class="bg-white text-[#4e73df] px-5 py-2 rounded-full text-sm font-bold hover:shadow-lg transition-all hover:-translate-y-0.5">
+                        Registrarse
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('register') }}">
-                        <i class="fas fa-user-plus"></i> Registrarse
-                    </a>
-                </li>
-            </ul>
+                </div>
+                <!-- Mobile button -->
+                <button class="md:hidden text-white text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars" id="menuIcon"></i>
+                </button>
+            </div>
         </div>
-    </div>
-</nav>
-
-<!-- Hero Section -->
-<header class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="display-4 font-weight-bold">Bienvenido a BetterMe</h1>
-        <p class="lead">Tu asistente personal para desarrollar hábitos positivos y alcanzar tus metas.</p>
-        <div class="mt-4">
-            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg mr-2">
-                <i class="fas fa-rocket"></i> Comenzar Gratis
-            </a>
-            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
-                <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-[#3a5fc8] pb-4 px-4 space-y-2">
+            <a href="#como-funciona" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">¿Cómo funciona?</a>
+            <a href="#funcionalidades" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">Funcionalidades</a>
+            <a href="#testimonios" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">Testimonios</a>
+            <a href="{{ url_for('login') }}" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">Iniciar sesión</a>
+            <a href="{{ url_for('register') }}" onclick="toggleMobileMenu()"
+               class="block bg-white text-[#4e73df] px-5 py-2 rounded-full text-sm font-bold text-center">
+                Registrarse
             </a>
         </div>
-    </div>
-</header>
+    </nav>
 
-<!-- Características -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4 mb-4">
-                <div class="card text-center h-100 shadow">
-                    <div class="card-body">
-                        <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Seguimiento de Hábitos</h5>
-                        <p class="card-text">Registra y da seguimiento a tus hábitos diarios. Marca como completados y acumula recompensas.</p>
+    <!-- ====== HERO SECTION ====== -->
+    <section class="gradient-hero pt-20 pb-16 md:pt-28 md:pb-20 relative overflow-hidden">
+        <!-- Decorative circles -->
+        <div class="absolute top-20 left-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-10 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+        <div class="absolute top-40 right-1/4 w-40 h-40 bg-[#1cc88a]/20 rounded-full blur-2xl"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Left: Text -->
+                <div class="text-center md:text-left">
+                    <div class="inline-flex items-center bg-white/15 backdrop-blur-sm text-white text-sm font-semibold px-4 py-1.5 rounded-full mb-6 animate-fade-in">
+                        <i class="fas fa-sparkles mr-2" style="color: #f6c23e;"></i>
+                        Tu sistema de hábitos con gamificación
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 animate-fade-in animate-fade-in-delay-1">
+                        Convierte tus buenas intenciones en
+                        <span style="color: #f6c23e;">hábitos reales</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-white/80 mb-8 max-w-xl mx-auto md:mx-0 animate-fade-in animate-fade-in-delay-2">
+                        BetterMe usa gamificación y psicología conductual para ayudarte a ser constante.
+                        Cada hábito cumplido = monedas. Cada día consistente = racha que crece.
+                        <strong class="text-white">Empieza hoy.</strong>
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in animate-fade-in-delay-3">
+                        <a href="{{ url_for('register') }}"
+                           class="btn-primary text-white px-8 py-3.5 rounded-full text-lg font-bold inline-flex items-center justify-center gap-2">
+                            Comenzar gratis
+                            <i class="fas fa-arrow-right text-sm"></i>
+                        </a>
+                        <a href="#como-funciona"
+                           class="btn-outline text-white px-8 py-3.5 rounded-full text-lg font-semibold inline-flex items-center justify-center gap-2">
+                            <i class="fas fa-play-circle"></i>
+                            Ver demo
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-6 mt-8 justify-center md:justify-start text-white/60 text-sm animate-fade-in animate-fade-in-delay-4">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Sin tarjeta</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Gratis siempre</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Cancela cuando quieras</span>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-                <div class="card text-center h-100 shadow">
-                    <div class="card-body">
-                        <i class="fas fa-fire fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title">Sistema de Rachas</h5>
-                        <p class="card-text">Mantén la consistencia día tras día. Cada racha cuenta y te motiva a seguir adelante.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-                <div class="card text-center h-100 shadow">
-                    <div class="card-body">
-                        <i class="fas fa-coins fa-3x text-warning mb-3"></i>
-                        <h5 class="card-title">Recompensas</h5>
-                        <p class="card-text">Gana monedas por cada hábito completado. ¡Tu esfuerzo tiene recompensa!</p>
+                <!-- Right: Image Placeholder -->
+                <div class="animate-fade-in animate-fade-in-delay-2">
+                    <div class="demo-placeholder shadow-2xl">
+                        <i class="fas fa-leaf text-5xl mb-4" style="color: #4e73df;"></i>
+                        <p class="text-lg font-bold" style="color: #5a5c69;">IMAGEN DEMO</p>
+                        <p style="color: #7a8299;" class="text-sm max-w-xs">Dashboard de BetterMe — Monedas, hábitos, rachas y gráfica de progreso</p>
+                        <div class="flex gap-2 mt-4">
+                            <span class="px-3 py-1 bg-[#4e73df]/10 text-[#4e73df] rounded-full text-xs font-semibold">📊 Estadísticas</span>
+                            <span class="px-3 py-1 bg-[#1cc88a]/10 text-[#1cc88a] rounded-full text-xs font-semibold">🏆 Rachas</span>
+                            <span class="px-3 py-1 bg-[#f6c23e]/10 text-[#b8941a] rounded-full text-xs font-semibold">🪙 Monedas</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-3">
-    <div class="container">
-        <p class="mb-0">&copy; 2024 BetterMe. Todos los derechos reservados.</p>
-    </div>
-</footer>
-{% endblock %}
+    <!-- ====== CÓMO FUNCIONA ====== -->
+    <section id="como-funciona" class="py-16 md:py-24" style="background: #f8f9fc;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-sm font-bold uppercase tracking-widest" style="color: #4e73df;">Cómo funciona</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
+                    Tres pasos para transformar tu vida
+                </h2>
+                <p class="mt-3" style="color: #858796;">Simple, intuitivo y motivador. Así de fácil.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-number" style="background: #e8f5f0;">
+                        <span style="color: #1cc88a;">1</span>
+                    </div>
+                    <div class="feature-icon mx-auto mb-4" style="background: #e8f5f0; color: #1cc88a;">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: #5a5c69;">Marca tus hábitos</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">
+                        Registra tus hábitos diarios y márcalos como completados. Desde "Beber agua" hasta "Meditar 10 min".
+                    </p>
+                </div>
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-number" style="background: #fef6e6;">
+                        <span style="color: #f6c23e;">2</span>
+                    </div>
+                    <div class="feature-icon mx-auto mb-4" style="background: #fef6e6; color: #f6c23e;">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: #5a5c69;">Gana monedas</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">
+                        Cada hábito cumplido te da monedas. Mantén tu racha y acumula recompensas.
+                    </p>
+                </div>
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-number" style="background: #e8edfc;">
+                        <span style="color: #4e73df;">3</span>
+                    </div>
+                    <div class="feature-icon mx-auto mb-4" style="background: #e8edfc; color: #4e73df;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: #5a5c69;">Mira tu progreso</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">
+                        Dashboard con estadísticas, calendario de rachas y gráfica de cumplimiento. Todo en un solo lugar.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== FUNCIONALIDADES DESTACADAS ====== -->
+    <section id="funcionalidades" class="py-16 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-sm font-bold uppercase tracking-widest" style="color: #1cc88a;">Funcionalidades</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
+                    Todo lo que necesitas para ser constante
+                </h2>
+                <p class="mt-3" style="color: #858796;">Herramientas diseñadas para mantenerte motivado todos los días.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                    <div class="feature-icon mb-4" style="background: #e8edfc; color: #4e73df;">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Gamificación real</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">Monedas, rachas, niveles. La consistencia se recompensa.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                    <div class="feature-icon mb-4" style="background: #fef6e6; color: #f6c23e;">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Metas de ahorro</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">Ahorra dinero mientras cumples hábitos. Único en su tipo.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                    <div class="feature-icon mb-4" style="background: #e8f5f0; color: #1cc88a;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Dashboard visual</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">Estadísticas claras de tu evolución. Ve tu mejora día a día.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                    <div class="feature-icon mb-4" style="background: #fce8e8; color: #e74a3b;">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Avatares personalizables</h3>
+                    <p style="color: #858796;" class="text-sm leading-relaxed">Desbloquea avatares con tus monedas. Hazlo tuyo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== ESTADÍSTICAS ====== -->
+    <section class="py-16 md:py-20 gradient-hero relative overflow-hidden">
+        <div class="absolute inset-0 bg-white/5"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white">
+                    Estadísticas que impactan
+                </h2>
+                <p class="text-white/70 mt-2">La comunidad BetterMe crece cada día.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="15000">+15,000</div>
+                    <p class="text-white/70 mt-1 text-sm font-semibold">Hábitos completados</p>
+                </div>
+                <div>
+                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="1234">1,234</div>
+                    <p class="text-white/70 mt-1 text-sm font-semibold">Rachas activas</p>
+                </div>
+                <div>
+                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="5000">5,000+</div>
+                    <p class="text-white/70 mt-1 text-sm font-semibold">Usuarios felices</p>
+                </div>
+                <div>
+                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="250000">250,000+</div>
+                    <p class="text-white/70 mt-1 text-sm font-semibold">Monedas entregadas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== TESTIMONIOS ====== -->
+    <section id="testimonios" class="py-16 md:py-24" style="background: #f8f9fc;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-sm font-bold uppercase tracking-widest" style="color: #4e73df;">Testimonios</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
+                    Lo que dicen nuestros usuarios
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="testimonial-card">
+                    <div class="flex items-center gap-1 mb-3" style="color: #f6c23e;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-4" style="color: #5a5c69;">
+                        "Llevaba años intentando ser más organizado. BetterMe me dio el sistema que necesitaba. Llevo 47 días de racha."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background: #4e73df;">CM</div>
+                        <div>
+                            <p class="font-bold text-sm" style="color: #5a5c69;">Carlos M.</p>
+                            <p class="text-xs" style="color: #858796;">47 días de racha</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="flex items-center gap-1 mb-3" style="color: #f6c23e;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-4" style="color: #5a5c69;">
+                        "La mejor parte son las metas de ahorro. Nunca había visto una app de hábitos que me ayudara también con mis finanzas."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background: #1cc88a;">VR</div>
+                        <div>
+                            <p class="font-bold text-sm" style="color: #5a5c69;">Valentina R.</p>
+                            <p class="text-xs" style="color: #858796;">Ahorradora constante</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="flex items-center gap-1 mb-3" style="color: #f6c23e;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-4" style="color: #5a5c69;">
+                        "Es simple, bonita, y funciona. Eso es todo lo que necesito."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background: #f6c23e;">AP</div>
+                        <div>
+                            <p class="font-bold text-sm" style="color: #5a5c69;">Andrés P.</p>
+                            <p class="text-xs" style="color: #858796;">Usuario premium</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== CTA FINAL ====== -->
+    <section class="py-16 md:py-24 gradient-cta relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full bg-white/5"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4">
+                ¿Listo para ser tu mejor versión?
+            </h2>
+            <p class="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+                Únete a miles de personas que ya están mejorando un hábito a la vez.
+                <strong class="text-white">Gratis para siempre</strong> (con opción premium).
+            </p>
+            <a href="{{ url_for('register') }}"
+               class="inline-flex items-center gap-2 bg-white text-[#4e73df] px-10 py-4 rounded-full text-xl font-extrabold shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+                Comenzar ahora
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <p class="text-white/60 text-sm mt-4">
+                <i class="fas fa-lock"></i> Sin compromiso. Cancela cuando quieras.
+            </p>
+        </div>
+    </section>
+
+    <!-- ====== FOOTER ====== -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Brand -->
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-2 text-white mb-4">
+                        <i class="fas fa-leaf text-2xl" style="color: #1cc88a;"></i>
+                        <span class="text-xl font-extrabold">BetterMe</span>
+                    </div>
+                    <p class="text-sm leading-relaxed">Tu compañero diario para convertir buenas intenciones en hábitos reales.</p>
+                </div>
+                <!-- Links -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Empresa</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Sobre nosotros</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contacto</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Términos y condiciones</a></li>
+                        <li><a href="#" class="hover:text-white transition">Política de privacidad</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Síguenos</h4>
+                    <div class="flex space-x-4 text-xl">
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-xs">¿Preguntas? Escríbenos a</p>
+                        <a href="mailto:hola@betterme.app" class="text-sm text-[#4e73df] hover:underline">hola@betterme.app</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-10 pt-8 text-center text-sm">
+                <p>&copy; 2024 BetterMe. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ====== JAVASCRIPT ====== -->
+    <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const icon = document.getElementById('menuIcon');
+        menu.classList.toggle('hidden');
+        if (menu.classList.contains('hidden')) {
+            icon.className = 'fas fa-bars';
+        } else {
+            icon.className = 'fas fa-times';
+        }
+    }
+
+    // Close mobile menu on link click
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.add('hidden');
+            document.getElementById('menuIcon').className = 'fas fa-bars';
+        });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Counter animation for statistics
+    function animateCounters() {
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const text = counter.textContent;
+            const isK = text.includes('K');
+            const hasPlus = text.includes('+');
+            const cleanText = text.replace(/[+,K]/g, '').replace(/,/g, '');
+            const numTarget = parseInt(cleanText);
+
+            if (isNaN(numTarget)) return;
+
+            let current = 0;
+            const increment = Math.ceil(numTarget / 60);
+            const step = Math.max(1, increment);
+
+            const updateCounter = () => {
+                current += step;
+                if (current >= numTarget) {
+                    current = numTarget;
+                    counter.textContent = current.toLocaleString() + (hasPlus ? '+' : '');
+                    return;
+                }
+                counter.textContent = current.toLocaleString() + (hasPlus ? '+' : '');
+                requestAnimationFrame(updateCounter);
+            };
+            updateCounter();
+        });
+    }
+
+    // Trigger counters when section is visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounters();
+                observer.disconnect();
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.gradient-hero .grid.grid-cols-2');
+    if (statsSection) {
+        observer.observe(statsSection.closest('section'));
+    }
+
+    // Navbar shadow on scroll
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('nav');
+        if (window.scrollY > 50) {
+            nav.classList.add('shadow-2xl');
+        } else {
+            nav.classList.remove('shadow-2xl');
+        }
+    });
+    </script>
+</body>
+</html>
