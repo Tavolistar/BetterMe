@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Tienda{% endblock %}
+
+{% block page_content %}
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('index') }}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">BetterMe</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('shop') }}">
+                <i class="fas fa-fw fa-store"></i>
+                <span>Tienda</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('coin_history') }}">
+                <i class="fas fa-fw fa-history"></i>
+                <span>Historial</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('avatars') }}">
+                <i class="fas fa-fw fa-user-circle"></i>
+                <span>Avatares</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.user_name }}</span>
+                            <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/' ~ session.user_avatar) if session.user_avatar else url_for('static', filename='img/undraw_profile.svg') }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{{ url_for('index') }}">
+                                <i class="fas fa-home fa-sm fa-fw mr-2"></i> Inicio
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-store"></i> Tienda BetterMe
+                    </h1>
+                    <div class="d-flex align-items-center">
+                        <span class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                            <i class="fas fa-coins text-warning"></i> {{ coins }} monedas
+                        </span>
+                        <a href="{{ url_for('coin_history') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-history"></i> Historial
+                        </a>
+                    </div>
+                </div>
+
+                {% if not items %}
+                <div class="text-center py-5">
+                    <i class="fas fa-store-alt fa-4x text-gray-300 mb-3"></i>
+                    <p class="text-gray-500">La tienda está vacía. Pide al administrador que la inicialice.</p>
+                    <a href="{{ url_for('seed_shop') }}" class="btn btn-primary">
+                        <i class="fas fa-seedling"></i> Inicializar Tienda
+                    </a>
+                </div>
+                {% else %}
+
+                <!-- Products Grid -->
+                <div class="row">
+                    {% for item in items %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card shadow h-100 {% if item.id in purchased_ids %}border-success{% endif %}">
+                            <div class="card-body text-center py-4">
+                                <!-- Icono según categoría -->
+                                <div class="mb-3">
+                                    {% if item.category == 'avatar' %}
+                                        <i class="fas fa-user-circle fa-4x text-primary"></i>
+                                    {% elif item.category == 'theme' %}
+                                        <i class="fas fa-moon fa-4x text-dark"></i>
+                                    {% elif item.category == 'background' %}
+                                        <i class="fas fa-image fa-4x text-info"></i>
+                                    {% elif item.category == 'icon' %}
+                                        <i class="fas fa-star fa-4x text-warning"></i>
+                                    {% elif item.category == 'sound' %}
+                                        <i class="fas fa-music fa-4x text-danger"></i>
+                                    {% else %}
+                                        <i class="fas fa-gift fa-4x text-secondary"></i>
+                                    {% endif %}
+                                </div>
+
+                                <h5 class="card-title font-weight-bold">{{ item.name }}</h5>
+                                <p class="card-text text-muted small">{{ item.description or 'Sin descripción' }}</p>
+
+                                <div class="mt-3">
+                                    {% if item.id in purchased_ids %}
+                                        <span class="badge badge-success px-3 py-2">
+                                            <i class="fas fa-check"></i> Adquirido
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-warning px-3 py-2 mb-2">
+                                            <i class="fas fa-coins"></i> {{ item.price }} monedas
+                                        </span>
+                                        <br>
+                                        <a href="{{ url_for('buy_item', item_id=item.id) }}"
+                                           class="btn btn-primary btn-sm mt-1"
+                                           onclick="return confirm('¿Comprar {{ item.name }} por {{ item.price }} monedas?')">
+                                            <i class="fas fa-shopping-cart"></i> Comprar
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>&copy; 2024 BetterMe</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Historial de Monedas{% endblock %}
+
+{% block page_content %}
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('index') }}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">BetterMe</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('shop') }}">
+                <i class="fas fa-fw fa-store"></i>
+                <span>Tienda</span>
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('coin_history') }}">
+                <i class="fas fa-fw fa-history"></i>
+                <span>Historial</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('avatars') }}">
+                <i class="fas fa-fw fa-user-circle"></i>
+                <span>Avatares</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.user_name }}</span>
+                            <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/' ~ session.user_avatar) if session.user_avatar else url_for('static', filename='img/undraw_profile.svg') }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{{ url_for('index') }}">
+                                <i class="fas fa-home fa-sm fa-fw mr-2"></i> Inicio
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-history"></i> Historial de Monedas
+                    </h1>
+                    <div class="d-flex align-items-center">
+                        <span class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                            <i class="fas fa-coins text-warning"></i> {{ coins }} monedas
+                        </span>
+                        <a href="{{ url_for('shop') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-store"></i> Tienda
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Balance Summary -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Saldo Actual</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ coins }} <i class="fas fa-coins text-warning"></i></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-coins fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions Table -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Todas las transacciones</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="transactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Concepto</th>
+                                        <th class="text-center">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tx in transactions %}
+                                    <tr>
+                                        <td class="text-muted small">{{ tx.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>{{ tx.concept }}</td>
+                                        <td class="text-center">
+                                            {% if tx.amount > 0 %}
+                                                <span class="text-success font-weight-bold">+{{ tx.amount }}</span>
+                                            {% else %}
+                                                <span class="text-danger font-weight-bold">{{ tx.amount }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-receipt fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-gray-500">No hay transacciones aún. ¡Completa hábitos para ganar monedas!</p>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                                <i class="fas fa-tasks"></i> Ir al Dashboard
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>&copy; 2024 BetterMe</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+{% endblock %}

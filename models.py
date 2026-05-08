@@ -51,7 +51,7 @@ class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=True)
-    coins = db.Column(db.Integer, default=5)
+    coins = db.Column(db.Integer, default=10)  # MO-02: +10 monedas por hábito
     is_custom = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
 
@@ -113,3 +113,48 @@ class HabitLog(db.Model):
 
     def __repr__(self):
         return f'<HabitLog user={self.user_id} habit={self.habit_id} date={self.date} completed={self.completed}>'
+
+
+class ShopItem(db.Model):
+    """Producto disponible en la tienda de BetterMe."""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200), nullable=True)
+    price = db.Column(db.Integer, nullable=False, default=50)
+    image = db.Column(db.String(100), nullable=True)  # nombre del archivo de imagen
+    category = db.Column(db.String(50), default='avatar')  # avatar, fondo, icono, etc.
+    stock = db.Column(db.Integer, default=-1)  # -1 = ilimitado
+
+    purchases = db.relationship('UserPurchase', backref='item', lazy='dynamic', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<ShopItem {self.id}: {self.name} ${self.price}>'
+
+
+class CoinTransaction(db.Model):
+    """Registro de transacciones de monedas (MO-05)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    amount = db.Column(db.Integer, nullable=False)  # positivo = ganó, negativo = gastó
+    concept = db.Column(db.String(200), nullable=False)  # ej: "Hábito: Beber agua", "Compra: Avatar 3"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('coin_transactions', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<CoinTransaction user={self.user_id} amount={self.amount} concept={self.concept}>'
+
+
+class UserPurchase(db.Model):
+    """Compra realizada por un usuario en la tienda."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('shop_item.id'), nullable=False)
+    purchased_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('purchases', lazy='dynamic'))
+
+    __table_args__ = (db.UniqueConstraint('user_id', 'item_id', name='uq_user_item'),)
+
+    def __repr__(self):
+        return f'<UserPurchase user={self.user_id} item={self.item_id}>'

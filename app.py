@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from functools import wraps
 import os
 import secrets
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 
-from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog
+from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog, ShopItem, CoinTransaction, UserPurchase
 
 # Cargar variables de entorno
 load_dotenv()
@@ -590,6 +590,7 @@ def api_habit_stats():
 @app.route("/toggle_habit/<int:habit_id>")
 @login_required
 def toggle_habit(habit_id):
+    """MO-02/MO-03: Marcar/desmarcar hábito. +10 al completar, -5 al desmarcar."""
     user_id = session['user_id']
 
     # Buscar o crear el UserHabit para este usuario y hábito
@@ -599,6 +600,8 @@ def toggle_habit(habit_id):
         db.session.add(uh)
         db.session.flush()
 
+    # Guardar estado anterior para saber si completó o desmarcó
+    was_completed = uh.completed
     uh.completed = not uh.completed
     uh.completed_date = date.today() if uh.completed else None
 
@@ -606,11 +609,26 @@ def toggle_habit(habit_id):
     progress = UserProgress.query.filter_by(user_id=user_id).first()
     if progress:
         progress.update_streak()
-        if uh.completed:
-            progress.coins += habit.coins
-        else:
-            progress.coins = max(0, progress.coins - (habit.coins // 2))
-        db.session.commit()
+        if uh.completed and not was_completed:
+            # MO-02: +10 monedas por completar hábito
+            progress.coins += 10
+            # Registrar transacción positiva
+            tx = CoinTransaction(
+                user_id=user_id,
+                amount=10,
+                concept=f"✅ Hábito completado: {habit.name}"
+            )
+            db.session.add(tx)
+        elif not uh.completed and was_completed:
+            # MO-03: -5 monedas por desmarcar hábito
+            progress.coins = max(0, progress.coins - 5)
+            # Registrar transacción negativa
+            tx = CoinTransaction(
+                user_id=user_id,
+                amount=-5,
+                concept=f"❌ Hábito desmarcado: {habit.name}"
+            )
+            db.session.add(tx)
 
     # Registrar en HabitLog para el histórico
     today = date.today()
@@ -631,6 +649,114 @@ def toggle_habit(habit_id):
 
     db.session.commit()
     return redirect(url_for('dashboard'))
+
+
+# ====== MO-05: HISTORIAL DE TRANSACCIONES ======
+@app.route("/coin_history")
+@login_required
+def coin_history():
+    """Muestra el historial de transacciones de monedas del usuario."""
+    user_id = session['user_id']
+    transactions = CoinTransaction.query.filter_by(user_id=user_id)\
+        .order_by(CoinTransaction.created_at.desc()).all()
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+    return render_template("coin_history.html",
+                           transactions=transactions,
+                           coins=progress.coins if progress else 0)
+
+
+# ====== MO-06: TIENDA ======
+@app.route("/shop")
+@login_required
+def shop():
+    """Tienda de BetterMe: compra avatares y productos con monedas."""
+    user_id = session['user_id']
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+    items = ShopItem.query.all()
+    # IDs de items que el usuario ya compró
+    purchased_ids = [p.item_id for p in UserPurchase.query.filter_by(user_id=user_id).all()]
+    return render_template("shop.html",
+                           items=items,
+                           coins=progress.coins if progress else 0,
+                           purchased_ids=purchased_ids)
+
+
+@app.route("/buy_item/<int:item_id>")
+@login_required
+def buy_item(item_id):
+    """Comprar un item de la tienda con monedas."""
+    user_id = session['user_id']
+    item = ShopItem.query.get_or_404(item_id)
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+
+    if not progress:
+        flash('Error al obtener tu progreso.', 'danger')
+        return redirect(url_for('shop'))
+
+    # Verificar si ya lo compró
+    existing = UserPurchase.query.filter_by(user_id=user_id, item_id=item_id).first()
+    if existing:
+        flash('Ya tienes este producto.', 'warning')
+        return redirect(url_for('shop'))
+
+    # Verificar si tiene suficientes monedas
+    if progress.coins < item.price:
+        flash(f'No tienes suficientes monedas. Necesitas {item.price} 🪙 y tienes {progress.coins}.', 'danger')
+        return redirect(url_for('shop'))
+
+    # Descontar monedas
+    progress.coins -= item.price
+
+    # Registrar compra
+    purchase = UserPurchase(user_id=user_id, item_id=item_id)
+    db.session.add(purchase)
+
+    # Registrar transacción
+    tx = CoinTransaction(
+        user_id=user_id,
+        amount=-item.price,
+        concept=f"🛒 Compra: {item.name}"
+    )
+    db.session.add(tx)
+
+    # Si es un avatar, actualizar el avatar del usuario
+    if item.category == 'avatar' and item.image:
+        user = User.query.get(user_id)
+        if user:
+            user.avatar = item.image
+
+    db.session.commit()
+    flash(f'🎉 ¡Has comprado {item.name} por {item.price} monedas!', 'success')
+    return redirect(url_for('shop'))
+
+
+# ====== SEMILLA DE PRODUCTOS PARA LA TIENDA ======
+@app.route("/seed_shop")
+def seed_shop():
+    """Poblar la tienda con productos iniciales (solo ejecutar una vez)."""
+    if ShopItem.query.count() > 0:
+        flash('La tienda ya tiene productos.', 'info')
+        return redirect(url_for('shop'))
+
+    products = [
+        ShopItem(name="Avatar Ninja", description="Un avatar con estilo ninja sigiloso.", price=50, category="avatar", image="avatar_ninja.png"),
+        ShopItem(name="Avatar Astronauta", description="Explora el espacio con este avatar.", price=80, category="avatar", image="avatar_astronauta.png"),
+        ShopItem(name="Avatar Vikingo", description="Un guerrero vikingo para tu perfil.", price=70, category="avatar", image="avatar_vikingo.png"),
+        ShopItem(name="Avatar Robot", description="Un avatar robótico de última generación.", price=100, category="avatar", image="avatar_robot.png"),
+        ShopItem(name="Avatar Mago", description="Poderes mágicos para tu personaje.", price=90, category="avatar", image="avatar_mago.png"),
+        ShopItem(name="Avatar Pirata", description="¡Al abordaje! Un avatar pirata.", price=60, category="avatar", image="avatar_pirata.png"),
+        ShopItem(name="Tema Oscuro", description="Activa el modo oscuro en tu dashboard.", price=120, category="theme", image=None),
+        ShopItem(name="Fondo Estelar", description="Fondo espacial para tu perfil.", price=40, category="background", image=None),
+        ShopItem(name="Ícono Especial", description="Un ícono exclusivo para tus hábitos.", price=30, category="icon", image=None),
+        ShopItem(name="Pack de Sonidos", description="Efectos de sonido al completar hábitos.", price=150, category="sound", image=None),
+    ]
+
+    for p in products:
+        db.session.add(p)
+    db.session.commit()
+
+    flash('🎉 ¡Tienda poblada con 10 productos!', 'success')
+    return redirect(url_for('shop'))
 
 
 if __name__ == "__main__":
