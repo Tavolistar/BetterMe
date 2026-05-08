@@ -81,19 +81,40 @@ class UserProgress(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True, index=True)
     coins = db.Column(db.Integer, default=100)
     streak = db.Column(db.Integer, default=0)
+    best_streak = db.Column(db.Integer, default=0)
     last_activity = db.Column(db.Date, default=date.today)
 
     def update_streak(self):
+        """RA-01/RA-02: Incrementa racha si hoy ya completó al menos 1 hábito.
+        Si last_activity es de ayer, incrementa. Si es más antiguo, resetea a 1.
+        Si last_activity ya es hoy, no hace nada (evita doble conteo)."""
         today = date.today()
-        if self.last_activity != today:
-            if self.last_activity == date.fromordinal(today.toordinal() - 1):
-                self.streak += 1
-            else:
-                self.streak = 1
-            self.last_activity = today
+        yesterday = date.fromordinal(today.toordinal() - 1)
+
+        if self.last_activity == today:
+            # Ya se actualizó hoy, no hacer nada
+            return
+
+        if self.last_activity == yesterday:
+            # Día consecutivo: +1 racha
+            self.streak += 1
+        else:
+            # Se saltó un día: racha vuelve a 1
+            self.streak = 1
+
+        self.last_activity = today
+
+        # RA-04: Actualizar mejor racha histórica
+        if self.streak > self.best_streak:
+            self.best_streak = self.streak
+
+    def reset_streak(self):
+        """RA-02: Fuerza racha a 0 cuando se verifica que no completó ningún hábito ayer."""
+        self.streak = 0
+        self.last_activity = date.today()
 
     def __repr__(self):
-        return f'<UserProgress user={self.user_id}: {self.coins} coins, {self.streak} streak>'
+        return f'<UserProgress user={self.user_id}: {self.coins} coins, streak={self.streak}, best={self.best_streak}>'
 
 
 class HabitLog(db.Model):

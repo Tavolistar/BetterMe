@@ -364,6 +364,14 @@ def dashboard():
     tasks = Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all()
     progress = UserProgress.query.filter_by(user_id=user_id).first()
 
+    # RA-02: Verificar si se saltó un día al cargar dashboard
+    if progress:
+        today = date.today()
+        yesterday = date.fromordinal(today.toordinal() - 1)
+        if progress.last_activity and progress.last_activity < yesterday:
+            progress.reset_streak()
+            db.session.commit()
+
     # Calcular estadísticas basadas en UserHabit
     total_habits = len(user_habits_data)
     completed_habits = sum(1 for uh in user_habits_data if uh['user_habit'].completed)
@@ -374,6 +382,7 @@ def dashboard():
                            user_habits_data=user_habits_data,
                            coins=progress.coins if progress else 100,
                            streak=progress.streak if progress else 0,
+                           best_streak=progress.best_streak if progress else 0,
                            progress_percentage=progress_percentage,
                            completed_habits=completed_habits,
                            total_habits=total_habits)
@@ -623,10 +632,82 @@ def api_coin_stats():
     })
 
 
+@app.route("/api/check_streak")
+@login_required
+def api_check_streak():
+    """RA-02: Verifica si el usuario se saltó un día y resetea la racha si es necesario.
+    Se llama al cargar el dashboard."""
+    user_id = session['user_id']
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+    if not progress:
+        return jsonify({'streak': 0, 'best_streak': 0})
+
+    today = date.today()
+    yesterday = date.fromordinal(today.toordinal() - 1)
+
+    # Si last_activity es anterior a ayer, significa que se saltó al menos un día
+    if progress.last_activity and progress.last_activity < yesterday:
+        progress.reset_streak()
+        db.session.commit()
+
+    return jsonify({
+        'streak': progress.streak,
+        'best_streak': progress.best_streak
+    })
+
+
+@app.route("/api/streak_calendar")
+@login_required
+def api_streak_calendar():
+    """RA-05: Devuelve datos para el calendario visual de rachas (últimos 60 días).
+    Cada día indica si el usuario completó AL MENOS 1 hábito."""
+    user_id = session['user_id']
+    days = request.args.get('days', 60, type=int)
+    days = max(30, min(days, 90))
+
+    today = date.today()
+    start_date = date.fromordinal(today.toordinal() - days + 1)
+
+    # Obtener todos los HabitLog del usuario en el rango
+    logs = HabitLog.query.filter(
+        HabitLog.user_id == user_id,
+        HabitLog.date >= start_date,
+        HabitLog.date <= today,
+        HabitLog.completed == True
+    ).all()
+
+    # Crear un set de días donde completó AL MENOS 1 hábito
+    completed_days = set()
+    for log in logs:
+        completed_days.add(log.date.isoformat())
+
+    # Generar array día por día
+    calendar_data = []
+    for i in range(days):
+        d = date.fromordinal(start_date.toordinal() + i)
+        date_str = d.isoformat()
+        calendar_data.append({
+            'date': date_str,
+            'completed': date_str in completed_days,
+            'day_name': d.strftime('%a'),
+            'day_of_week': d.weekday(),  # 0=lunes, 6=domingo
+            'is_today': d == today
+        })
+
+    return jsonify({
+        'calendar': calendar_data,
+        'start_date': start_date.isoformat(),
+        'end_date': today.isoformat(),
+        'total_days': days,
+        'completed_days': len(completed_days)
+    })
+
+
 @app.route("/toggle_habit/<int:habit_id>")
 @login_required
 def toggle_habit(habit_id):
-    """MO-02/MO-03: Marcar/desmarcar hábito. +10 al completar, -5 al desmarcar."""
+    """MO-02/MO-03: Marcar/desmarcar hábito. +10 al completar, -5 al desmarcar.
+    RA-01/RA-02: Actualiza racha solo al COMPLETAR un hábito (no al desmarcar)."""
     user_id = session['user_id']
 
     # Buscar o crear el UserHabit para este usuario y hábito
@@ -644,8 +725,9 @@ def toggle_habit(habit_id):
     habit = Habit.query.get_or_404(habit_id)
     progress = UserProgress.query.filter_by(user_id=user_id).first()
     if progress:
-        progress.update_streak()
         if uh.completed and not was_completed:
+            # RA-01: Solo actualizar racha cuando COMPLETA un hábito
+            progress.update_streak()
             # MO-02: +10 monedas por completar hábito
             progress.coins += 10
             # Registrar transacción positiva
@@ -656,7 +738,7 @@ def toggle_habit(habit_id):
             )
             db.session.add(tx)
         elif not uh.completed and was_completed:
-            # MO-03: -5 monedas por desmarcar hábito
+            # MO-03: -5 monedas por desmarcar hábito (NO afecta la racha)
             progress.coins = max(0, progress.coins - 5)
             # Registrar transacción negativa
             tx = CoinTransaction(

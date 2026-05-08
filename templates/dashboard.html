@@ -152,7 +152,15 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                             Racha Actual</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ streak }} días</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ streak }} <small class="text-muted" style="font-size: 0.6rem;">días</small>
+                                            <i class="fas fa-fire text-danger"></i>
+                                        </div>
+                                        <div class="mt-1">
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-trophy"></i> Mejor: {{ best_streak }} días
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-fire fa-2x text-danger"></i>
@@ -437,6 +445,29 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- RA-05: Calendario visual de rachas -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-success">
+                                    <i class="fas fa-calendar-alt"></i> Calendario de Rachas (60 días)
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="streakCalendar" class="text-center">
+                                    <div class="d-flex justify-content-center mb-2">
+                                        <div id="calendarGrid" class="d-flex flex-wrap" style="gap: 3px; max-width: 320px;"></div>
+                                    </div>
+                                    <div class="mt-2 d-flex justify-content-center align-items-center gap-3 small text-muted">
+                                        <span><span class="streak-square streak-empty d-inline-block"></span> No</span>
+                                        <span><span class="streak-square streak-completed d-inline-block"></span> Hecho</span>
+                                        <span><span class="streak-square streak-today d-inline-block"></span> Hoy</span>
+                                    </div>
+                                    <div id="calendarLoading" class="text-muted small mt-2">
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando calendario...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -505,6 +536,48 @@
 <form id="deleteHabitForm" method="POST" style="display:none;">
 </form>
 
+<style>
+/* RA-05: Estilos para el calendario de rachas */
+.streak-square {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+}
+.streak-empty {
+    background-color: #ebedf0;
+}
+.streak-completed {
+    background-color: #1cc88a;
+    border-color: #17a673;
+}
+.streak-today {
+    background-color: #4e73df;
+    border-color: #3a5fc8;
+    box-shadow: 0 0 4px rgba(78, 115, 223, 0.5);
+}
+.streak-square:hover {
+    transform: scale(1.3);
+    transition: transform 0.15s ease;
+    cursor: pointer;
+}
+#calendarGrid {
+    justify-content: flex-start;
+}
+.calendar-tooltip {
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    transform: translate(-50%, -120%);
+}
+</style>
+
 <script>
 function confirmDeleteHabit(habitId, habitName) {
     if (confirm(`¿Estás seguro de eliminar el hábito "${habitName}"?`)) {
@@ -514,11 +587,86 @@ function confirmDeleteHabit(habitId, habitName) {
     }
 }
 
-// Cargar gráficas cuando el DOM esté listo
+// RA-05: Cargar calendario visual de rachas
+function loadStreakCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    const loading = document.getElementById('calendarLoading');
+    if (!grid) return;
+
+    fetch('/api/streak_calendar?days=60')
+        .then(response => response.json())
+        .then(data => {
+            if (loading) loading.style.display = 'none';
+            grid.innerHTML = '';
+
+            const days = data.calendar;
+
+            // Agrupar por semanas (lunes=0 a domingo=6)
+            // Encontrar el primer lunes para empezar la cuadrícula
+            const firstDate = new Date(days[0].date);
+            const startDayOfWeek = firstDate.getDay(); // 0=domingo
+            // Convertir a lunes=0: (getDay() + 6) % 7
+            const startOffset = (startDayOfWeek + 6) % 7;
+
+            // Agregar espacios vacíos para alinear primera semana
+            for (let i = 0; i < startOffset; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'streak-square';
+                empty.style.border = 'none';
+                empty.style.backgroundColor = 'transparent';
+                grid.appendChild(empty);
+            }
+
+            // Agregar cada día
+            days.forEach(day => {
+                const square = document.createElement('div');
+                square.className = 'streak-square';
+
+                if (day.is_today) {
+                    square.classList.add('streak-today');
+                    square.title = `Hoy (${day.date})`;
+                } else if (day.completed) {
+                    square.classList.add('streak-completed');
+                    square.title = `${day.date} - ✅ Hecho`;
+                } else {
+                    square.classList.add('streak-empty');
+                    square.title = `${day.date} - Sin actividad`;
+                }
+
+                // Tooltip mejorado
+                square.addEventListener('mouseenter', function(e) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'calendar-tooltip';
+                    const dateObj = new Date(day.date + 'T12:00:00');
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    const dateStr = dateObj.toLocaleDateString('es-ES', options);
+                    const status = day.completed ? '✅ Hábito completado' : '❌ Sin actividad';
+                    tooltip.textContent = `${dateStr}: ${status}`;
+                    document.body.appendChild(tooltip);
+
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+                    tooltip.style.top = (rect.top) + 'px';
+                });
+                square.addEventListener('mouseleave', function() {
+                    document.querySelectorAll('.calendar-tooltip').forEach(el => el.remove());
+                });
+
+                grid.appendChild(square);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar calendario:', error);
+            if (loading) loading.textContent = '❌ Error al cargar calendario';
+        });
+}
+
+// Cargar gráficas y calendario cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         if (typeof loadHabitChart === 'function') loadHabitChart();
         if (typeof loadCoinChart === 'function') loadCoinChart();
+        if (typeof loadStreakCalendar === 'function') loadStreakCalendar();
     }, 500);
 });
 </script>
