@@ -179,3 +179,60 @@ class UserPurchase(db.Model):
 
     def __repr__(self):
         return f'<UserPurchase user={self.user_id} item={self.item_id}>'
+
+
+# ====== MÓDULO DE AHORROS ======
+
+class Category(db.Model):
+    """Categoría de gasto/ingreso para el sistema de ahorros."""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    icon = db.Column(db.String(50), default='fas fa-tag')
+    color = db.Column(db.String(7), default='#4e73df')  # color hex
+    type = db.Column(db.String(10), default='expense')  # 'income' o 'expense'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)  # NULL = categoría global
+
+    transactions = db.relationship('Transaction', backref='category', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<Category {self.id}: {self.name} ({self.type})>'
+
+
+class Transaction(db.Model):
+    """Transacción financiera: ingreso o gasto."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False, index=True)
+    amount = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String(200), nullable=True)
+    date = db.Column(db.Date, nullable=False, default=date.today)
+    type = db.Column(db.String(10), nullable=False)  # 'income' o 'expense'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('transactions', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<Transaction {self.id}: {self.type} ${self.amount} ({self.date})>'
+
+
+class SavingsGoal(db.Model):
+    """Meta de ahorro del usuario."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    name = db.Column(db.String(100), nullable=False)
+    target_amount = db.Column(db.Float, nullable=False)
+    current_amount = db.Column(db.Float, default=0.0)
+    deadline = db.Column(db.Date, nullable=True)
+    color = db.Column(db.String(7), default='#1cc88a')
+    completed = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('savings_goals', lazy='dynamic'))
+
+    def progress_percentage(self):
+        if self.target_amount <= 0:
+            return 0
+        return min(100, int((self.current_amount / self.target_amount) * 100))
+
+    def __repr__(self):
+        return f'<SavingsGoal {self.id}: {self.name} ${self.current_amount}/${self.target_amount}>'

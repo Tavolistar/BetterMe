@@ -2,6 +2,11 @@
 
 {% block title %}BetterMe - Dashboard{% endblock %}
 
+{% block extra_head %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block page_content %}
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -28,6 +33,14 @@
             </a>
         </li>
 
+        <!-- Nav Item - Ahorros -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('savings') }}">
+                <i class="fas fa-fw fa-piggy-bank"></i>
+                <span>Ahorros</span>
+            </a>
+        </li>
+
         <!-- Nav Item - Tienda -->
         <li class="nav-item">
             <a class="nav-link" href="{{ url_for('shop') }}">
@@ -49,6 +62,16 @@
             <a class="nav-link" href="{{ url_for('avatars') }}">
                 <i class="fas fa-fw fa-user-circle"></i>
                 <span>Avatares</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+
+        <!-- Nav Item - Premium -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('premium') }}">
+                <i class="fas fa-fw fa-crown"></i>
+                <span>Premium</span>
             </a>
         </li>
 
@@ -85,7 +108,7 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.get('user_name', 'Usuario') }}</span>
                             <img class="img-profile rounded-circle"
-                                 src="{{ url_for('static', filename='img/' ~ session.get('user_avatar', 'undraw_profile.svg')) }}">
+                                 src="{{ session.get('user_avatar', 'undraw_profile.svg') | avatar_url }}">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -404,7 +427,7 @@
                             <div class="card-body">
                                 <div class="text-center mb-3">
                                     <img class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"
-                                         src="{{ url_for('static', filename='img/' ~ session.get('user_avatar', 'undraw_profile.svg')) }}"
+                                         src="{{ session.get('user_avatar', 'undraw_profile.svg') | avatar_url }}"
                                          alt="Avatar">
                                     <h5 class="mt-2">{{ session.get('user_name', 'Usuario') }}</h5>
                                 </div>

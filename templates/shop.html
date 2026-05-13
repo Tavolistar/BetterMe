@@ -38,6 +38,13 @@
                 <span>Avatares</span>
             </a>
         </li>
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('premium') }}">
+                <i class="fas fa-fw fa-crown"></i>
+                <span>Premium</span>
+            </a>
+        </li>
         <hr class="sidebar-divider d-none d-md-block">
         <div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -58,7 +65,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-toggle="dropdown">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.user_name }}</span>
-                            <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/' ~ session.user_avatar) if session.user_avatar else url_for('static', filename='img/undraw_profile.svg') }}">
+                            <img class="img-profile rounded-circle" src="{{ (session.user_avatar or 'undraw_profile.svg') | avatar_url }}">
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow">
                             <a class="dropdown-item" href="{{ url_for('index') }}">

@@ -1,0 +1,808 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Ahorros{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block page_content %}
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('index') }}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">BetterMe</div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Ahorros -->
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('savings') }}">
+                <i class="fas fa-fw fa-piggy-bank"></i>
+                <span>Ahorros</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Tienda -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('shop') }}">
+                <i class="fas fa-fw fa-store"></i>
+                <span>Tienda</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Historial -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('coin_history') }}">
+                <i class="fas fa-fw fa-history"></i>
+                <span>Historial</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Avatares -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('avatars') }}">
+                <i class="fas fa-fw fa-user-circle"></i>
+                <span>Avatares</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+
+        <!-- Nav Item - Premium -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('premium') }}">
+                <i class="fas fa-fw fa-crown"></i>
+                <span>Premium</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Toggler -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.get('user_name', 'Usuario') }}</span>
+                            <img class="img-profile rounded-circle"
+                                 src="{{ session.get('user_avatar', 'undraw_profile.svg') | avatar_url }}">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="{{ url_for('avatars') }}">
+                                <i class="fas fa-user-circle fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Avatares
+                            </a>
+                            <a class="dropdown-item" href="{{ url_for('index') }}">
+                                <i class="fas fa-home fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Inicio
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+
+                </ul>
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-piggy-bank text-primary"></i> Sistema de Ahorros
+                    </h1>
+                    <div>
+                        <button class="btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#addIncomeModal">
+                            <i class="fas fa-plus fa-sm text-white-50"></i> Ingreso
+                        </button>
+                        <button class="btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#addExpenseModal">
+                            <i class="fas fa-minus fa-sm text-white-50"></i> Gasto
+                        </button>
+                        <button class="btn btn-sm btn-info shadow-sm" data-toggle="modal" data-target="#addGoalModal">
+                            <i class="fas fa-bullseye fa-sm text-white-50"></i> Meta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Row - Stats Cards -->
+                <div class="row">
+
+                    <!-- Balance Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Capital Total</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            ${{ "%.2f"|format(balance) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-wallet fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ingresos Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Total Ingresos</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            ${{ "%.2f"|format(total_income) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-arrow-down fa-2x text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gastos Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-danger shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                            Total Gastos</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            ${{ "%.2f"|format(total_expenses) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-arrow-up fa-2x text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monedas Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Monedas BetterMe</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ coins }} <i class="fas fa-coins text-warning"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-coins fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row - Charts -->
+                <div class="row">
+
+                    <!-- Gráfica de Capital en el tiempo -->
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-line"></i> Capital a través del tiempo
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="balanceChart"></canvas>
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">Evolución del capital (ingresos - gastos) en los últimos 30 días</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica de pastel de gastos por categoría -->
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-pie"></i> Gastos por Categoría
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="categoryPieChart"></canvas>
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">Distribución de gastos por categoría</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row - Metas de Ahorro -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-success">
+                                    <i class="fas fa-bullseye"></i> Metas de Ahorro
+                                </h6>
+                                <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#addGoalModal">
+                                    <i class="fas fa-plus"></i> Nueva Meta
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                {% if goals %}
+                                <div class="row">
+                                    {% for goal in goals %}
+                                    <div class="col-xl-4 col-md-6 mb-4">
+                                        <div class="card border-left-success shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="font-weight-bold mb-0">{{ goal.name }}</h6>
+                                                    <form action="{{ url_for('delete_savings_goal', goal_id=goal.id) }}" method="POST" style="display:inline;">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar esta meta?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="text-center mb-2">
+                                                    <span class="h5 font-weight-bold" style="color: {{ goal.color }};">
+                                                        ${{ "%.2f"|format(goal.current_amount) }}
+                                                    </span>
+                                                    <span class="text-muted"> / ${{ "%.2f"|format(goal.target_amount) }}</span>
+                                                </div>
+                                                <div class="progress mb-2" style="height: 12px;">
+                                                    <div class="progress-bar" role="progressbar"
+                                                         style="width: {{ goal.progress_percentage() }}%; background-color: {{ goal.color }};"
+                                                         aria-valuenow="{{ goal.progress_percentage() }}" aria-valuemin="0" aria-valuemax="100">
+                                                        {{ goal.progress_percentage() }}%
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between small text-muted">
+                                                    <span>
+                                                        {% if goal.deadline %}
+                                                        <i class="fas fa-calendar"></i> {{ goal.deadline.strftime('%d/%m/%Y') }}
+                                                        {% else %}
+                                                        Sin fecha límite
+                                                        {% endif %}
+                                                    </span>
+                                                    {% if goal.completed %}
+                                                    <span class="badge badge-success">✅ Completada</span>
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Formulario rápido para actualizar progreso -->
+                                                <form action="{{ url_for('update_savings_goal', goal_id=goal.id) }}" method="POST" class="mt-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="number" class="form-control" name="current_amount"
+                                                               value="{{ goal.current_amount }}" step="0.01" min="0">
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-success" type="submit">
+                                                                <i class="fas fa-sync"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-info-circle"></i> No tienes metas de ahorro aún.
+                                    <button class="btn btn-sm btn-success ml-2" data-toggle="modal" data-target="#addGoalModal">
+                                        <i class="fas fa-plus"></i> Crear primera meta
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row - Transacciones -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-list"></i> Historial de Transacciones
+                                </h6>
+                                <div>
+                                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#addIncomeModal">
+                                        <i class="fas fa-plus"></i> Ingreso
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#addExpenseModal">
+                                        <i class="fas fa-minus"></i> Gasto
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {% if transactions %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="transactionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Tipo</th>
+                                                <th>Categoría</th>
+                                                <th>Descripción</th>
+                                                <th class="text-right">Monto</th>
+                                                <th class="text-center">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for tx in transactions %}
+                                            <tr>
+                                                <td>{{ tx.date.strftime('%d/%m/%Y') }}</td>
+                                                <td>
+                                                    {% if tx.type == 'income' %}
+                                                    <span class="badge badge-success">
+                                                        <i class="fas fa-arrow-down"></i> Ingreso
+                                                    </span>
+                                                    {% else %}
+                                                    <span class="badge badge-danger">
+                                                        <i class="fas fa-arrow-up"></i> Gasto
+                                                    </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <i class="{{ tx.category.icon }}" style="color: {{ tx.category.color }};"></i>
+                                                    {{ tx.category.name }}
+                                                </td>
+                                                <td>{{ tx.description or '-' }}</td>
+                                                <td class="text-right font-weight-bold {% if tx.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                                    {% if tx.type == 'income' %}+{% else %}-{% endif %}${{ "%.2f"|format(tx.amount) }}
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="{{ url_for('delete_transaction', tx_id=tx.id) }}"
+                                                       class="btn btn-sm btn-outline-danger"
+                                                       onclick="return confirm('¿Eliminar esta transacción?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="font-weight-bold">
+                                                <td colspan="4" class="text-right">Totales:</td>
+                                                <td class="text-right text-success">+${{ "%.2f"|format(total_income) }}</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr class="font-weight-bold">
+                                                <td colspan="4" class="text-right"></td>
+                                                <td class="text-right text-danger">-${{ "%.2f"|format(total_expenses) }}</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr class="font-weight-bold">
+                                                <td colspan="4" class="text-right">Capital:</td>
+                                                <td class="text-right text-primary">${{ "%.2f"|format(balance) }}</td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-info-circle"></i> No hay transacciones registradas.
+                                    <br>
+                                    <button class="btn btn-sm btn-success mt-2" data-toggle="modal" data-target="#addIncomeModal">
+                                        <i class="fas fa-plus"></i> Registrar primer ingreso
+                                    </button>
+                                    <button class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#addExpenseModal">
+                                        <i class="fas fa-minus"></i> Registrar primer gasto
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>&copy; 2024 BetterMe. Todos los derechos reservados.</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- ─── MODALES ──────────────────────────────────────────────── -->
+
+<!-- Modal: Agregar Ingreso -->
+<div class="modal fade" id="addIncomeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{ url_for('add_transaction') }}" method="POST">
+                <input type="hidden" name="type" value="income">
+                <div class="modal-header">
+                    <h5 class="modal-title text-success">
+                        <i class="fas fa-arrow-down"></i> Registrar Ingreso
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Monto ($)</label>
+                        <input type="number" class="form-control" name="amount" step="0.01" min="0.01"
+                               placeholder="Ej: 1500.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select class="form-control" name="category_id" required>
+                            <option value="">Seleccionar categoría...</option>
+                            {% for cat in categories if cat.type == 'income' %}
+                            <option value="{{ cat.id }}">
+                                <i class="{{ cat.icon }}"></i> {{ cat.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción (opcional)</label>
+                        <input type="text" class="form-control" name="description"
+                               placeholder="Ej: Salario mensual">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" class="form-control" name="date" value="{{ today.isoformat() }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Registrar Ingreso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Agregar Gasto -->
+<div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{ url_for('add_transaction') }}" method="POST">
+                <input type="hidden" name="type" value="expense">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="fas fa-arrow-up"></i> Registrar Gasto
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Monto ($)</label>
+                        <input type="number" class="form-control" name="amount" step="0.01" min="0.01"
+                               placeholder="Ej: 50.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select class="form-control" name="category_id" required>
+                            <option value="">Seleccionar categoría...</option>
+                            {% for cat in categories if cat.type == 'expense' %}
+                            <option value="{{ cat.id }}">
+                                <i class="{{ cat.icon }}"></i> {{ cat.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción (opcional)</label>
+                        <input type="text" class="form-control" name="description"
+                               placeholder="Ej: Compra del supermercado">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" class="form-control" name="date" value="{{ today.isoformat() }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check"></i> Registrar Gasto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Agregar Meta de Ahorro -->
+<div class="modal fade" id="addGoalModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{ url_for('add_savings_goal') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title text-success">
+                        <i class="fas fa-bullseye"></i> Nueva Meta de Ahorro
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nombre de la meta</label>
+                        <input type="text" class="form-control" name="name"
+                               placeholder="Ej: Viaje a la playa" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto objetivo ($)</label>
+                        <input type="number" class="form-control" name="target_amount" step="0.01" min="1"
+                               placeholder="Ej: 5000.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Progreso actual ($)</label>
+                        <input type="number" class="form-control" name="current_amount" step="0.01" min="0"
+                               placeholder="Ej: 500.00" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha límite (opcional)</label>
+                        <input type="date" class="form-control" name="deadline">
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <input type="color" class="form-control" name="color" value="#1cc88a" style="height: 40px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Crear Meta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para el módulo de ahorros */
+.table td, .table th {
+    vertical-align: middle;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+</style>
+
+<script>
+// ─── Gráfica de Capital a través del tiempo ────────────────────
+
+function loadBalanceChart() {
+    const canvas = document.getElementById('balanceChart');
+    if (!canvas) return;
+
+    fetch('/api/savings/balance_history')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = canvas.getContext('2d');
+
+            if (window.balanceChartInstance) {
+                window.balanceChartInstance.destroy();
+            }
+
+            window.balanceChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Capital ($)',
+                        data: data.data,
+                        backgroundColor: 'rgba(78, 115, 223, 0.2)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointHoverBorderColor: '#fff',
+                        pointHitRadius: 10,
+                        pointBorderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error al cargar gráfica de capital:', error));
+}
+
+// ─── Gráfica de pastel de gastos por categoría ─────────────────
+
+function loadCategoryPieChart() {
+    const canvas = document.getElementById('categoryPieChart');
+    if (!canvas) return;
+
+    fetch('/api/savings/category_pie')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = canvas.getContext('2d');
+
+            if (window.categoryPieChartInstance) {
+                window.categoryPieChartInstance.destroy();
+            }
+
+            if (data.labels.length === 0) {
+                // Mostrar mensaje de "sin datos"
+                const parent = canvas.parentElement;
+                const msg = document.createElement('div');
+                msg.className = 'text-center text-muted py-5';
+                msg.innerHTML = '<i class="fas fa-chart-pie fa-3x mb-2"></i><br>No hay gastos registrados aún';
+                parent.appendChild(msg);
+                canvas.style.display = 'none';
+                return;
+            }
+
+            window.categoryPieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: data.colors,
+                        hoverBackgroundColor: data.colors,
+                        hoverBorderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return context.label + ': $' + value.toFixed(2) + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error al cargar gráfica de categorías:', error));
+}
+
+// Cargar gráficas cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        loadBalanceChart();
+        loadCategoryPieChart();
+    }, 500);
+});
+</script>
+
+{% endblock %}

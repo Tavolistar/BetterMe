@@ -6,7 +6,7 @@ import secrets
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 
-from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog, ShopItem, CoinTransaction, UserPurchase
+from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog, ShopItem, CoinTransaction, UserPurchase, Category, Transaction, SavingsGoal
 
 # Cargar variables de entorno
 load_dotenv()
@@ -14,9 +14,19 @@ load_dotenv()
 # Obtener la ruta base del proyecto
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask(__name__, instance_path=os.path.join(basedir, 'instance'))
+# En Render, la DB viene de DATABASE_URL (PostgreSQL).
+# En local, usa SQLite.
+is_production = os.getenv('RENDER', '') == 'true'
+
+if is_production:
+    app = Flask(__name__)
+    # Render provee DATABASE_URL automáticamente si agregas PostgreSQL
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+else:
+    app = Flask(__name__, instance_path=os.path.join(basedir, 'instance'))
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///betterme.db')
+
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///betterme.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Configuración de Flask-Mail
@@ -30,6 +40,18 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', '')
 # Inicializar extensiones
 db.init_app(app)
 mail = Mail(app)
+
+
+# ─── Filtro Jinja para resolver ruta de avatares ────────────────────
+@app.template_filter('avatar_url')
+def avatar_url_filter(filename):
+    """Resuelve la ruta correcta para avatares.
+    Los avatares predeterminados (undraw_*.svg) están en static/img/.
+    Los avatares seleccionables (avatar_*.svg) están en static/avatars/.
+    """
+    if filename and filename.startswith('avatar_'):
+        return url_for('static', filename='avatars/' + filename)
+    return url_for('static', filename='img/' + (filename or 'undraw_profile.svg'))
 
 
 # ─── Decorador: login requerido ─────────────────────────────────────
@@ -58,6 +80,30 @@ with app.app_context():
             Habit(name='Leer 20 páginas', description='Leer 20 páginas de un libro', coins=8)
         ]
         db.session.bulk_save_objects(default_habits)
+        db.session.commit()
+
+    # Crear categorías globales de ahorro si no existen
+    if Category.query.count() == 0:
+        default_categories = [
+            # Ingresos
+            Category(name='Salario', icon='fas fa-briefcase', color='#1cc88a', type='income'),
+            Category(name='Freelance', icon='fas fa-laptop-code', color='#36b9cc', type='income'),
+            Category(name='Inversiones', icon='fas fa-chart-line', color='#4e73df', type='income'),
+            Category(name='Ventas', icon='fas fa-tag', color='#f6c23e', type='income'),
+            Category(name='Otros ingresos', icon='fas fa-plus-circle', color='#858796', type='income'),
+            # Gastos
+            Category(name='Alimentación', icon='fas fa-utensils', color='#e74a3b', type='expense'),
+            Category(name='Transporte', icon='fas fa-bus', color='#fd7e14', type='expense'),
+            Category(name='Vivienda', icon='fas fa-home', color='#5a5c69', type='expense'),
+            Category(name='Servicios', icon='fas fa-bolt', color='#f6c23e', type='expense'),
+            Category(name='Salud', icon='fas fa-heartbeat', color='#e74a3b', type='expense'),
+            Category(name='Entretenimiento', icon='fas fa-film', color='#36b9cc', type='expense'),
+            Category(name='Educación', icon='fas fa-book', color='#4e73df', type='expense'),
+            Category(name='Ropa', icon='fas fa-tshirt', color='#1cc88a', type='expense'),
+            Category(name='Ahorro', icon='fas fa-piggy-bank', color='#1cc88a', type='expense'),
+            Category(name='Otros gastos', icon='fas fa-ellipsis-h', color='#858796', type='expense'),
+        ]
+        db.session.bulk_save_objects(default_categories)
         db.session.commit()
 
 
@@ -270,6 +316,13 @@ def reset_password_confirm(token):
 def index():
     """Página de inicio / landing page."""
     return render_template("index.html")
+
+
+@app.route("/premium")
+@login_required
+def premium():
+    """Página de planes y precios Premium."""
+    return render_template("premium.html")
 
 
 @app.route("/avatars")
@@ -938,5 +991,272 @@ def seed_shop():
     return redirect(url_for('shop'))
 
 
+# ====== MÓDULO DE AHORROS ======
+
+@app.route("/savings")
+@login_required
+def savings():
+    """Dashboard principal del sistema de ahorros."""
+    user_id = session['user_id']
+    progress = UserProgress.query.filter_by(user_id=user_id).first()
+
+    # Categorías del usuario + globales
+    categories = Category.query.filter(
+        (Category.user_id == user_id) | (Category.user_id.is_(None))
+    ).order_by(Category.type, Category.name).all()
+
+    # Transacciones del usuario (ordenadas por fecha descendente)
+    transactions = Transaction.query.filter_by(user_id=user_id)\
+        .order_by(Transaction.date.desc(), Transaction.created_at.desc()).all()
+
+    # Metas de ahorro
+    goals = SavingsGoal.query.filter_by(user_id=user_id).order_by(SavingsGoal.created_at.desc()).all()
+
+    # Calcular totales
+    total_income = sum(t.amount for t in transactions if t.type == 'income')
+    total_expenses = sum(t.amount for t in transactions if t.type == 'expense')
+    balance = total_income - total_expenses
+
+    today = date.today()
+
+    return render_template("savings.html",
+                           categories=categories,
+                           transactions=transactions,
+                           goals=goals,
+                           total_income=total_income,
+                           total_expenses=total_expenses,
+                           balance=balance,
+                           coins=progress.coins if progress else 0,
+                           today=today)
+
+
+@app.route("/savings/add_transaction", methods=['POST'])
+@login_required
+def add_transaction():
+    """Agregar una nueva transacción (ingreso o gasto)."""
+    user_id = session['user_id']
+    amount = request.form.get('amount', 0, type=float)
+    category_id = request.form.get('category_id', 0, type=int)
+    description = request.form.get('description', '').strip()
+    transaction_date = request.form.get('date', date.today().isoformat())
+    trans_type = request.form.get('type', 'expense')
+
+    if amount <= 0:
+        flash('El monto debe ser mayor a cero.', 'danger')
+        return redirect(url_for('savings'))
+
+    if not category_id:
+        flash('Debes seleccionar una categoría.', 'danger')
+        return redirect(url_for('savings'))
+
+    try:
+        trans_date = date.fromisoformat(transaction_date)
+    except (ValueError, TypeError):
+        trans_date = date.today()
+
+    tx = Transaction(
+        user_id=user_id,
+        category_id=category_id,
+        amount=amount,
+        description=description,
+        date=trans_date,
+        type=trans_type
+    )
+    db.session.add(tx)
+    db.session.commit()
+
+    flash(f'✅ {"Ingreso" if trans_type == "income" else "Gasto"} registrado: ${amount:.2f}', 'success')
+    return redirect(url_for('savings'))
+
+
+@app.route("/savings/delete_transaction/<int:tx_id>")
+@login_required
+def delete_transaction(tx_id):
+    """Eliminar una transacción."""
+    user_id = session['user_id']
+    tx = Transaction.query.filter_by(id=tx_id, user_id=user_id).first_or_404()
+    db.session.delete(tx)
+    db.session.commit()
+    flash('🗑️ Transacción eliminada.', 'success')
+    return redirect(url_for('savings'))
+
+
+@app.route("/savings/add_goal", methods=['POST'])
+@login_required
+def add_savings_goal():
+    """Crear una nueva meta de ahorro."""
+    user_id = session['user_id']
+    name = request.form.get('name', '').strip()
+    target_amount = request.form.get('target_amount', 0, type=float)
+    current_amount = request.form.get('current_amount', 0, type=float)
+    deadline_str = request.form.get('deadline', '')
+    color = request.form.get('color', '#1cc88a')
+
+    if not name or target_amount <= 0:
+        flash('Nombre y monto objetivo son obligatorios.', 'danger')
+        return redirect(url_for('savings'))
+
+    deadline = None
+    if deadline_str:
+        try:
+            deadline = date.fromisoformat(deadline_str)
+        except (ValueError, TypeError):
+            deadline = None
+
+    goal = SavingsGoal(
+        user_id=user_id,
+        name=name,
+        target_amount=target_amount,
+        current_amount=current_amount,
+        deadline=deadline,
+        color=color
+    )
+    db.session.add(goal)
+    db.session.commit()
+
+    flash(f'🎯 Meta de ahorro "{name}" creada.', 'success')
+    return redirect(url_for('savings'))
+
+
+@app.route("/savings/update_goal/<int:goal_id>", methods=['POST'])
+@login_required
+def update_savings_goal(goal_id):
+    """Actualizar el progreso de una meta de ahorro."""
+    user_id = session['user_id']
+    goal = SavingsGoal.query.filter_by(id=goal_id, user_id=user_id).first_or_404()
+
+    current_amount = request.form.get('current_amount', 0, type=float)
+    goal.current_amount = max(0, current_amount)
+
+    # Verificar si la meta se acaba de completar (antes no estaba completada)
+    was_completed = goal.completed
+    goal.completed = goal.current_amount >= goal.target_amount
+
+    # Recompensa de monedas al completar la meta
+    coins_awarded = 0
+    if goal.completed and not was_completed:
+        # Calcular monedas: base 50 + bonus según dificultad (target_amount / 100)
+        coins_awarded = 50 + min(int(goal.target_amount / 100), 200)
+        user = User.query.get(user_id)
+        user.coins = (user.coins or 0) + coins_awarded
+        # Registrar transacción de monedas
+        tx = CoinTransaction(
+            user_id=user_id,
+            amount=coins_awarded,
+            description=f'Meta de ahorro completada: {goal.name}',
+            tx_type='earn'
+        )
+        db.session.add(tx)
+
+    db.session.commit()
+
+    if coins_awarded > 0:
+        flash(f'🎉 Meta "{goal.name}" completada! Has ganado {coins_awarded} monedas BetterMe!', 'success')
+    else:
+        flash(f'💰 Meta "{goal.name}" actualizada: ${goal.current_amount:.2f}/${goal.target_amount:.2f}', 'success')
+    return redirect(url_for('savings'))
+
+
+@app.route("/savings/delete_goal/<int:goal_id>", methods=['POST'])
+@login_required
+def delete_savings_goal(goal_id):
+    """Eliminar una meta de ahorro."""
+    user_id = session['user_id']
+    goal = SavingsGoal.query.filter_by(id=goal_id, user_id=user_id).first_or_404()
+    name = goal.name
+    db.session.delete(goal)
+    db.session.commit()
+    flash(f'🗑️ Meta "{name}" eliminada.', 'success')
+    return redirect(url_for('savings'))
+
+
+# ─── API para gráficas del módulo de ahorros ─────────────────────
+
+@app.route("/api/savings/balance_history")
+@login_required
+def api_savings_balance_history():
+    """Devuelve datos para la gráfica de capital a través del tiempo (últimos 30 días)."""
+    user_id = session['user_id']
+    days = request.args.get('days', 30, type=int)
+    days = max(7, min(days, 90))
+
+    today = date.today()
+    dates = [today - timedelta(days=i) for i in range(days - 1, -1, -1)]
+
+    labels = []
+    data = []
+
+    for d in dates:
+        label = d.strftime('%d/%m')
+        labels.append(label)
+
+        # Calcular balance hasta esa fecha
+        income = db.session.query(db.func.sum(Transaction.amount))\
+            .filter(Transaction.user_id == user_id, Transaction.type == 'income', Transaction.date <= d).scalar() or 0
+        expenses = db.session.query(db.func.sum(Transaction.amount))\
+            .filter(Transaction.user_id == user_id, Transaction.type == 'expense', Transaction.date <= d).scalar() or 0
+        balance = income - expenses
+        data.append(round(balance, 2))
+
+    return jsonify({
+        'labels': labels,
+        'data': data
+    })
+
+
+@app.route("/api/savings/category_pie")
+@login_required
+def api_savings_category_pie():
+    """Devuelve datos para la gráfica de pastel de gastos por categoría."""
+    user_id = session['user_id']
+
+    # Obtener gastos agrupados por categoría
+    results = db.session.query(
+        Category.name,
+        Category.color,
+        Category.icon,
+        db.func.sum(Transaction.amount).label('total')
+    ).join(Transaction, Transaction.category_id == Category.id)\
+     .filter(Transaction.user_id == user_id, Transaction.type == 'expense')\
+     .group_by(Category.id)\
+     .order_by(db.func.sum(Transaction.amount).desc()).all()
+
+    labels = [r.name for r in results]
+    data = [round(r.total, 2) for r in results]
+    colors = [r.color for r in results]
+    icons = [r.icon for r in results]
+
+    return jsonify({
+        'labels': labels,
+        'data': data,
+        'colors': colors,
+        'icons': icons
+    })
+
+
+@app.route("/api/savings/goals_progress")
+@login_required
+def api_savings_goals_progress():
+    """Devuelve datos de progreso de metas de ahorro."""
+    user_id = session['user_id']
+    goals = SavingsGoal.query.filter_by(user_id=user_id).all()
+
+    data = []
+    for g in goals:
+        data.append({
+            'id': g.id,
+            'name': g.name,
+            'target': g.target_amount,
+            'current': g.current_amount,
+            'percentage': g.progress_percentage(),
+            'color': g.color,
+            'completed': g.completed,
+            'deadline': g.deadline.isoformat() if g.deadline else None
+        })
+
+    return jsonify({'goals': data})
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=not is_production)

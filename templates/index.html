@@ -155,6 +155,18 @@
         .animate-fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
         .animate-fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
         .animate-fade-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
+        /* Zoom en imagen Canvas */
+        .canvas-zoom-container {
+            overflow: hidden;
+            cursor: zoom-in;
+        }
+        .canvas-zoom-img {
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: center center;
+        }
+        .canvas-zoom-container:hover .canvas-zoom-img {
+            transform: scale(1.8);
+        }
     </style>
 </head>
 <body>
@@ -248,11 +260,6 @@
                             Comenzar gratis
                             <i class="fas fa-arrow-right text-sm"></i>
                         </a>
-                        <a href="#como-funciona"
-                           class="btn-outline text-white px-8 py-3.5 rounded-full text-lg font-semibold inline-flex items-center justify-center gap-2">
-                            <i class="fas fa-play-circle"></i>
-                            Ver demo
-                        </a>
                     </div>
                     <div class="flex items-center gap-6 mt-8 justify-center md:justify-start text-white/60 text-sm animate-fade-in animate-fade-in-delay-4">
                         <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Sin tarjeta</span>
@@ -262,16 +269,15 @@
                 </div>
                 <!-- Right: Image Placeholder -->
                 <div class="animate-fade-in animate-fade-in-delay-2">
-                    <div class="demo-placeholder shadow-2xl">
-                        <i class="fas fa-leaf text-5xl mb-4" style="color: #4e73df;"></i>
-                        <p class="text-lg font-bold" style="color: #5a5c69;">IMAGEN DEMO</p>
-                        <p style="color: #7a8299;" class="text-sm max-w-xs">Dashboard de BetterMe — Monedas, hábitos, rachas y gráfica de progreso</p>
-                        <div class="flex gap-2 mt-4">
-                            <span class="px-3 py-1 bg-[#4e73df]/10 text-[#4e73df] rounded-full text-xs font-semibold">📊 Estadísticas</span>
-                            <span class="px-3 py-1 bg-[#1cc88a]/10 text-[#1cc88a] rounded-full text-xs font-semibold">🏆 Rachas</span>
-                            <span class="px-3 py-1 bg-[#f6c23e]/10 text-[#b8941a] rounded-full text-xs font-semibold">🪙 Monedas</span>
-                        </div>
-                    </div>
+                    <img src="{{ url_for('static', filename='img/dashboard-preview.png') }}"
+                         alt="Dashboard de BetterMe"
+                         class="w-full rounded-2xl shadow-2xl border border-white/10"
+                         onerror="this.parentElement.innerHTML=`
+                            <div class=\'demo-placeholder shadow-2xl\'>
+                                <i class=\'fas fa-leaf text-5xl mb-4\' style=\'color: #4e73df;\'></i>
+                                <p class=\'text-lg font-bold\' style=\'color: #5a5c69;\'>IMAGEN DEMO</p>
+                                <p style=\'color: #7a8299;\' class=\'text-sm max-w-xs\'>Coloca tu imagen como static/img/dashboard-preview.png</p>
+                            </div>`">
                 </div>
             </div>
         </div>
@@ -380,32 +386,90 @@
         </div>
     </section>
 
-    <!-- ====== ESTADÍSTICAS ====== -->
+    <!-- ====== MODELO DE NEGOCIO CANVAS ====== -->
+    <section id="modelo-canvas" class="py-16 md:py-24" style="background: #f8f9fc;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-sm font-bold uppercase tracking-widest" style="color: #4e73df;">Modelo de Negocio</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
+                    Canvas BetterMe
+                </h2>
+                <p class="mt-3" style="color: #858796;">Así es como BetterMe genera valor y sostenibilidad.</p>
+            </div>
+            <div class="flex justify-center">
+                <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 md:p-8 border border-gray-100 canvas-zoom-container">
+                    <img src="{{ url_for('static', filename='img/canvas.png') }}"
+                         alt="Modelo de Negocio Canvas"
+                         class="w-full rounded-xl canvas-zoom-img"
+                         onerror="this.parentElement.innerHTML=`
+                            <div class=\'text-center py-16\'>
+                                <i class=\'fas fa-image text-6xl mb-4\' style=\'color: #b0b9cc;\'></i>
+                                <p class=\'text-lg font-bold\' style=\'color: #5a5c69;\'>IMAGEN CANVAS</p>
+                                <p style=\'color: #858796;\' class=\'text-sm\'>Coloca tu imagen como <strong>static/img/canvas.png</strong></p>
+                            </div>`">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== BENEFICIOS REALES ====== -->
     <section class="py-16 md:py-20 gradient-hero relative overflow-hidden">
         <div class="absolute inset-0 bg-white/5"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-extrabold text-white">
-                    Estadísticas que impactan
+                    <i class="fas fa-gem mr-3"></i> Todo en un solo lugar
                 </h2>
-                <p class="text-white/70 mt-2">La comunidad BetterMe crece cada día.</p>
+                <p class="text-white/70 mt-2">Las herramientas que necesitas para transformar tu vida.</p>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="15000">+15,000</div>
-                    <p class="text-white/70 mt-1 text-sm font-semibold">Hábitos completados</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1: Hábitos -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-1 group">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-check-double text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-white">Seguimiento de Hábitos</h3>
+                    <p class="text-white/60 text-sm mt-3 leading-relaxed">
+                        Registra tus hábitos diarios, lleva un historial por fechas y construye rachas impecables.
+                        Visualiza tu progreso con gráficas detalladas de cumplimiento.
+                    </p>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Rachas</span>
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Gráficas</span>
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Historial</span>
+                    </div>
                 </div>
-                <div>
-                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="1234">1,234</div>
-                    <p class="text-white/70 mt-1 text-sm font-semibold">Rachas activas</p>
+                <!-- Card 2: Ahorros -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-1 group">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-piggy-bank text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-white">Control de Ahorros</h3>
+                    <p class="text-white/60 text-sm mt-3 leading-relaxed">
+                        Gestiona tus ingresos y gastos por categorías. Establece metas de ahorro con fecha límite
+                        y da seguimiento visual con gráficas de evolución.
+                    </p>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Metas</span>
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Categorías</span>
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Dashboard</span>
+                    </div>
                 </div>
-                <div>
-                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="5000">5,000+</div>
-                    <p class="text-white/70 mt-1 text-sm font-semibold">Usuarios felices</p>
-                </div>
-                <div>
-                    <div class="text-4xl md:text-5xl font-extrabold text-white counter" data-target="250000">250,000+</div>
-                    <p class="text-white/70 mt-1 text-sm font-semibold">Monedas entregadas</p>
+                <!-- Card 3: Gamificación -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-1 group">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-trophy text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-white">Gamificación y Recompensas</h3>
+                    <p class="text-white/60 text-sm mt-3 leading-relaxed">
+                        Gana monedas por completar hábitos y metas. Canjéalas por avatares exclusivos
+                        en la tienda y personaliza tu perfil.
+                    </p>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Monedas</span>
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Avatares</span>
+                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Tienda</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -534,7 +598,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-800 mt-10 pt-8 text-center text-sm">
-                <p>&copy; 2024 BetterMe. Todos los derechos reservados.</p>
+                <p>&copy; 2024 BetterMe. Desarrollado por <span class="text-white font-semibold">Javier Gómez Villarruel 2230956</span></p>
             </div>
         </div>
     </footer>
@@ -614,7 +678,7 @@
         });
     }, { threshold: 0.5 });
 
-    const statsSection = document.querySelector('.gradient-hero .grid.grid-cols-2');
+    const statsSection = document.querySelector('.gradient-hero .grid');
     if (statsSection) {
         observer.observe(statsSection.closest('section'));
     }

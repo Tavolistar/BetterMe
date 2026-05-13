@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}BetterMe - Premium{% endblock %}
+
+{% block page_content %}
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('index') }}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">BetterMe</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('savings') }}">
+                <i class="fas fa-fw fa-piggy-bank"></i>
+                <span>Ahorros</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('shop') }}">
+                <i class="fas fa-fw fa-store"></i>
+                <span>Tienda</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('coin_history') }}">
+                <i class="fas fa-fw fa-history"></i>
+                <span>Historial</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('avatars') }}">
+                <i class="fas fa-fw fa-user-circle"></i>
+                <span>Avatares</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('premium') }}">
+                <i class="fas fa-fw fa-crown"></i>
+                <span>Premium</span>
+            </a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.get('user_name', 'Usuario') }}</span>
+                            <img class="img-profile rounded-circle"
+                                 src="{{ session.get('user_avatar', 'undraw_profile.svg') | avatar_url }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="{{ url_for('avatars') }}">
+                                <i class="fas fa-user-circle fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Avatares
+                            </a>
+                            <a class="dropdown-item" href="{{ url_for('index') }}">
+                                <i class="fas fa-home fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Inicio
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-crown text-warning"></i> BetterMe Premium
+                    </h1>
+                </div>
+
+                <!-- Pricing Cards -->
+                <div class="row justify-content-center">
+                    <!-- Plan Gratuito -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3 bg-white text-center border-0">
+                                <div class="text-center mb-3 mt-3">
+                                    <div class="d-inline-flex align-items-center justify-content-center"
+                                         style="width: 80px; height: 80px; border-radius: 50%; background: #f8f9fc;">
+                                        <i class="fas fa-leaf fa-3x text-success"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-weight-bold">Gratuito</h4>
+                                <p class="text-muted mb-0">Para empezar tu viaje</p>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-4">
+                                    <span class="display-4 font-weight-bold text-gray-800">$0</span>
+                                    <span class="text-muted">/mes</span>
+                                </div>
+                                <ul class="list-unstyled text-left mb-4" style="line-height: 2.2;">
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> 3 hábitos diarios</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de monedas</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Rachas y calendario</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Tienda de avatares</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de ahorros básico</li>
+                                    <li><i class="fas fa-times-circle text-muted mr-2"></i> Estadísticas avanzadas</li>
+                                    <li><i class="fas fa-times-circle text-muted mr-2"></i> Metas de ahorro ilimitadas</li>
+                                    <li><i class="fas fa-times-circle text-muted mr-2"></i> Soporte prioritario</li>
+                                </ul>
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-block">
+                                    Tu plan actual
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plan Premium -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card shadow h-100 border-warning">
+                            <div class="card-header py-2 bg-warning text-center border-0">
+                                <span class="text-white font-weight-bold text-uppercase small">
+                                    <i class="fas fa-star"></i> Más popular
+                                </span>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="text-center mb-3 mt-2">
+                                    <div class="d-inline-flex align-items-center justify-content-center"
+                                         style="width: 80px; height: 80px; border-radius: 50%; background: #fff8e6;">
+                                        <i class="fas fa-crown fa-3x text-warning"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-weight-bold">Premium</h4>
+                                <p class="text-muted mb-0">La experiencia completa</p>
+                                <div class="mb-4 mt-3">
+                                    <span class="display-4 font-weight-bold text-warning">$5,000</span>
+                                    <span class="text-muted">/mes</span>
+                                </div>
+                                <ul class="list-unstyled text-left mb-4" style="line-height: 2.2;">
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Hábitos ilimitados</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de monedas</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Rachas y calendario</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Tienda de avatares</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de ahorros completo</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Estadísticas avanzadas</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Metas de ahorro ilimitadas</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Soporte prioritario 24/7</li>
+                                </ul>
+                                <button class="btn btn-warning btn-block font-weight-bold" disabled>
+                                    <i class="fas fa-lock mr-2"></i> Próximamente
+                                </button>
+                                <p class="text-muted small mt-2">Pasarela de pago en desarrollo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Premium -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-gem"></i> ¿Qué incluye Premium?
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="text-center p-3">
+                                            <i class="fas fa-infinity fa-3x text-warning mb-3"></i>
+                                            <h6 class="font-weight-bold">Hábitos ilimitados</h6>
+                                            <p class="text-muted small">Sin límite de hábitos diarios. Crea todos los que necesites.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="text-center p-3">
+                                            <i class="fas fa-chart-bar fa-3x text-warning mb-3"></i>
+                                            <h6 class="font-weight-bold">Estadísticas avanzadas</h6>
+                                            <p class="text-muted small">Gráficas detalladas, reportes semanales y análisis de tendencias.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="text-center p-3">
+                                            <i class="fas fa-headset fa-3x text-warning mb-3"></i>
+                                            <h6 class="font-weight-bold">Soporte prioritario</h6>
+                                            <p class="text-muted small">Atención personalizada 24/7 para resolver cualquier duda.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>BetterMe &copy; 2026</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+{% endblock %}
