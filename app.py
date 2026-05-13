@@ -106,6 +106,93 @@ with app.app_context():
         db.session.bulk_save_objects(default_categories)
         db.session.commit()
 
+    # ─── Seed: usuario de prueba y datos demo ──────────────────────────
+    if is_production and User.query.filter_by(email='test@test.com').first() is None:
+        from datetime import date, timedelta
+        from werkzeug.security import generate_password_hash
+
+        # Crear usuario test
+        test_user = User(
+            email='test@test.com',
+            password=generate_password_hash('test123'),
+            nickname='TestUser',
+            avatar='avatar_1.svg',
+            coins=500,
+            created_at=date.today() - timedelta(days=60)
+        )
+        db.session.add(test_user)
+        db.session.commit()
+
+        # Asignar hábitos al usuario de prueba
+        all_habits = Habit.query.all()
+        for h in all_habits:
+            uh = UserHabit(user_id=test_user.id, habit_id=h.id)
+            db.session.add(uh)
+        db.session.commit()
+
+        # HabitLogs últimos 14 días
+        for i in range(14):
+            d = date.today() - timedelta(days=i)
+            for h in all_habits:
+                if (i + h.id) % 2 == 0:  # alternar para variar
+                    log = HabitLog(
+                        user_id=test_user.id,
+                        habit_id=h.id,
+                        logged_date=d,
+                        completed=True
+                    )
+                    db.session.add(log)
+        db.session.commit()
+
+        # CoinTransactions
+        for i in range(20):
+            ct = CoinTransaction(
+                user_id=test_user.id,
+                amount=10,
+                concept=f'Hábito completado - Día {i+1}',
+                created_at=datetime.now() - timedelta(days=i)
+            )
+            db.session.add(ct)
+        db.session.commit()
+
+        # Transacciones de ahorro (ingresos y gastos)
+        income_cats = Category.query.filter_by(type='income').all()
+        expense_cats = Category.query.filter_by(type='expense').all()
+        for i in range(15):
+            d = date.today() - timedelta(days=i*2)
+            tx = Transaction(
+                user_id=test_user.id,
+                category_id=income_cats[i % len(income_cats)].id,
+                amount=5000 + (i * 200),
+                description=f'Ingreso {i+1}',
+                date=d,
+                type='income'
+            )
+            db.session.add(tx)
+        for i in range(20):
+            d = date.today() - timedelta(days=i*2 + 1)
+            tx = Transaction(
+                user_id=test_user.id,
+                category_id=expense_cats[i % len(expense_cats)].id,
+                amount=500 + (i * 50),
+                description=f'Gasto {i+1}',
+                date=d,
+                type='expense'
+            )
+            db.session.add(tx)
+        db.session.commit()
+
+        # Metas de ahorro
+        goals = [
+            SavingsGoal(user_id=test_user.id, name='Viaje a la playa', target_amount=50000, current_amount=15000, deadline=date.today() + timedelta(days=90), color='#4e73df'),
+            SavingsGoal(user_id=test_user.id, name='Fondo de emergencia', target_amount=30000, current_amount=30000, deadline=date.today() + timedelta(days=30), color='#1cc88a', completed=True),
+            SavingsGoal(user_id=test_user.id, name='Curso online', target_amount=10000, current_amount=3500, deadline=date.today() + timedelta(days=45), color='#f6c23e'),
+        ]
+        db.session.bulk_save_objects(goals)
+        db.session.commit()
+
+        print("✅ Datos de prueba creados para test@test.com / test123")
+
 
 # ─── Función auxiliar ───────────────────────────────────────────────
 
