@@ -24,21 +24,27 @@ log = logging.getLogger(__name__)
 # Obtener la ruta base del proyecto
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# En Render, la DB viene de DATABASE_URL (PostgreSQL).
-# En local, usa SQLite.
-is_production = os.getenv('RENDER', '') == 'true'
+# Detectar produccion: si DATABASE_URL apunta a PostgreSQL, usarlo.
+# Si no, usar SQLite local. En Render, DATABASE_URL se inyecta automaticamente
+# al vincular una base de datos PostgreSQL al servicio.
+database_url = os.getenv('DATABASE_URL', '')
+is_production = database_url.startswith('postgres')
 
 if is_production:
-    app = Flask(__name__)
-    # Render provee DATABASE_URL automáticamente si agregas PostgreSQL
-    database_url = os.getenv('DATABASE_URL', '')
     # SQLAlchemy 2.x requiere postgresql:// pero Render da postgres://
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    log.info(f"Modo PRODUCCION: PostgreSQL ({database_url.split('@')[1] if '@' in database_url else '...'})")
 else:
     app = Flask(__name__, instance_path=os.path.join(basedir, 'instance'))
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///betterme.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///betterme.db'
+    if os.getenv('RENDER', ''):
+        log.warning("⚠ RENDER=true pero DATABASE_URL vacio o no es postgres. Usando SQLite.")
+        log.warning("⚠ Ve al dashboard de Render -> Environment y verifica DATABASE_URL")
+    else:
+        log.info("Modo LOCAL: usando SQLite")
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
