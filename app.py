@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from datetime import date, timedelta, datetime
 from functools import wraps
 import os
+import sys
+import logging
 import secrets
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
@@ -10,6 +12,14 @@ from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog, Sho
 
 # Cargar variables de entorno
 load_dotenv()
+
+# Configurar logging para Render (stdout visible en logs)
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(levelname)s] %(message)s',
+    stream=sys.stdout
+)
+log = logging.getLogger(__name__)
 
 # Obtener la ruta base del proyecto
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -111,95 +121,123 @@ with app.app_context():
         db.session.commit()
 
     # ─── Seed: usuario de prueba y datos demo ──────────────────────────
-    if is_production and User.query.filter_by(email='test@test.com').first() is None:
-        from datetime import date, timedelta
+    if is_production:
         from werkzeug.security import generate_password_hash
+        log.info("Modo produccion detectado. Iniciando seed de datos...")
+        try:
+            # Verificar conexion a DB
+            db.session.execute(db.text('SELECT 1'))
+            log.info("Conexion a PostgreSQL OK")
+        except Exception as e:
+            log.error(f"ERROR CRITICO: No se pudo conectar a la DB: {e}")
 
-        # Crear usuario test
-        test_user = User(
-            email='test@test.com',
-            password_hash=generate_password_hash('test123'),
-            name='TestUser',
-            avatar='avatar_1.svg',
-            created_at=date.today() - timedelta(days=60)
-        )
-        db.session.add(test_user)
-        db.session.commit()
+        if User.query.filter_by(email='test@test.com').first() is None:
+            try:
+                log.info("Usuario test no existe. Creando...")
+                # Crear usuario test
+                test_user = User(
+                    email='test@test.com',
+                    password_hash=generate_password_hash('test123'),
+                    name='TestUser',
+                    avatar='avatar_1.svg',
+                    created_at=datetime.now() - timedelta(days=60)
+                )
+                db.session.add(test_user)
+                db.session.commit()
+                log.info(f"Usuario test creado: id={test_user.id}")
 
-        # Crear progreso inicial con monedas
-        progress = UserProgress(user_id=test_user.id, coins=500)
-        db.session.add(progress)
-        db.session.commit()
+                # Crear progreso inicial con monedas
+                progress = UserProgress(user_id=test_user.id, coins=500)
+                db.session.add(progress)
+                db.session.commit()
+                log.info("UserProgress creado: coins=500")
 
-        # Asignar hábitos al usuario de prueba
-        all_habits = Habit.query.all()
-        for h in all_habits:
-            uh = UserHabit(user_id=test_user.id, habit_id=h.id)
-            db.session.add(uh)
-        db.session.commit()
+                # Asignar habitos al usuario de prueba
+                all_habits = Habit.query.all()
+                log.info(f"Asignando {len(all_habits)} habitos...")
+                for h in all_habits:
+                    uh = UserHabit(user_id=test_user.id, habit_id=h.id)
+                    db.session.add(uh)
+                db.session.commit()
 
-        # HabitLogs últimos 14 días
-        for i in range(14):
-            d = date.today() - timedelta(days=i)
-            for h in all_habits:
-                if (i + h.id) % 2 == 0:  # alternar para variar
-                    log = HabitLog(
+                # HabitLogs ultimos 14 dias
+                log_count = 0
+                for i in range(14):
+                    d = date.today() - timedelta(days=i)
+                    for h in all_habits:
+                        if (i + h.id) % 2 == 0:
+                            log_obj = HabitLog(
+                                user_id=test_user.id,
+                                habit_id=h.id,
+                                date=d,
+                                completed=True
+                            )
+                            db.session.add(log_obj)
+                            log_count += 1
+                db.session.commit()
+                log.info(f"HabitLogs creados: {log_count}")
+
+                # CoinTransactions
+                for i in range(20):
+                    ct = CoinTransaction(
                         user_id=test_user.id,
-                        habit_id=h.id,
-                        date=d,
-                        completed=True
+                        amount=10,
+                        concept=f'Habito completado - Dia {i+1}',
+                        created_at=datetime.now() - timedelta(days=i)
                     )
-                    db.session.add(log)
-        db.session.commit()
+                    db.session.add(ct)
+                db.session.commit()
+                log.info("CoinTransactions creadas: 20")
 
-        # CoinTransactions
-        for i in range(20):
-            ct = CoinTransaction(
-                user_id=test_user.id,
-                amount=10,
-                concept=f'Hábito completado - Día {i+1}',
-                created_at=datetime.now() - timedelta(days=i)
-            )
-            db.session.add(ct)
-        db.session.commit()
+                # Transacciones de ahorro
+                income_cats = Category.query.filter_by(type='income').all()
+                expense_cats = Category.query.filter_by(type='expense').all()
+                if income_cats and expense_cats:
+                    for i in range(15):
+                        d = date.today() - timedelta(days=i*2)
+                        tx = Transaction(
+                            user_id=test_user.id,
+                            category_id=income_cats[i % len(income_cats)].id,
+                            amount=5000 + (i * 200),
+                            description=f'Ingreso {i+1}',
+                            date=d,
+                            type='income'
+                        )
+                        db.session.add(tx)
+                    for i in range(20):
+                        d = date.today() - timedelta(days=i*2 + 1)
+                        tx = Transaction(
+                            user_id=test_user.id,
+                            category_id=expense_cats[i % len(expense_cats)].id,
+                            amount=500 + (i * 50),
+                            description=f'Gasto {i+1}',
+                            date=d,
+                            type='expense'
+                        )
+                        db.session.add(tx)
+                    db.session.commit()
+                    log.info("Transactions de ahorro creadas")
+                else:
+                    log.warning(f"No hay categorias. income_cats={len(income_cats)} expense_cats={len(expense_cats)}")
 
-        # Transacciones de ahorro (ingresos y gastos)
-        income_cats = Category.query.filter_by(type='income').all()
-        expense_cats = Category.query.filter_by(type='expense').all()
-        for i in range(15):
-            d = date.today() - timedelta(days=i*2)
-            tx = Transaction(
-                user_id=test_user.id,
-                category_id=income_cats[i % len(income_cats)].id,
-                amount=5000 + (i * 200),
-                description=f'Ingreso {i+1}',
-                date=d,
-                type='income'
-            )
-            db.session.add(tx)
-        for i in range(20):
-            d = date.today() - timedelta(days=i*2 + 1)
-            tx = Transaction(
-                user_id=test_user.id,
-                category_id=expense_cats[i % len(expense_cats)].id,
-                amount=500 + (i * 50),
-                description=f'Gasto {i+1}',
-                date=d,
-                type='expense'
-            )
-            db.session.add(tx)
-        db.session.commit()
+                # Metas de ahorro
+                goals = [
+                    SavingsGoal(user_id=test_user.id, name='Viaje a la playa', target_amount=50000, current_amount=15000, deadline=date.today() + timedelta(days=90), color='#4e73df'),
+                    SavingsGoal(user_id=test_user.id, name='Fondo de emergencia', target_amount=30000, current_amount=30000, deadline=date.today() + timedelta(days=30), color='#1cc88a', completed=True),
+                    SavingsGoal(user_id=test_user.id, name='Curso online', target_amount=10000, current_amount=3500, deadline=date.today() + timedelta(days=45), color='#f6c23e'),
+                ]
+                db.session.bulk_save_objects(goals)
+                db.session.commit()
+                log.info("SavingsGoals creadas: 3")
 
-        # Metas de ahorro
-        goals = [
-            SavingsGoal(user_id=test_user.id, name='Viaje a la playa', target_amount=50000, current_amount=15000, deadline=date.today() + timedelta(days=90), color='#4e73df'),
-            SavingsGoal(user_id=test_user.id, name='Fondo de emergencia', target_amount=30000, current_amount=30000, deadline=date.today() + timedelta(days=30), color='#1cc88a', completed=True),
-            SavingsGoal(user_id=test_user.id, name='Curso online', target_amount=10000, current_amount=3500, deadline=date.today() + timedelta(days=45), color='#f6c23e'),
-        ]
-        db.session.bulk_save_objects(goals)
-        db.session.commit()
-
-        print("✅ Datos de prueba creados para test@test.com / test123")
+                log.info("*** SEED COMPLETADO: test@test.com / test123 ***")
+            except Exception as e:
+                db.session.rollback()
+                log.error(f"ERROR EN SEED: {type(e).__name__}: {e}")
+                import traceback
+                log.error(traceback.format_exc())
+        else:
+            log.info("Usuario test ya existe, omitiendo seed.")
 
 
 # ─── Función auxiliar ───────────────────────────────────────────────
@@ -1350,6 +1388,59 @@ def api_savings_goals_progress():
         })
 
     return jsonify({'goals': data})
+
+
+# ─── RUTA DE DIAGNOSTICO (para depurar Render) ────────────────────
+
+@app.route("/debug-db")
+def debug_db():
+    """Muestra el estado de la base de datos en produccion."""
+    import json
+    info = {
+        'is_production': is_production,
+        'db_uri_type': 'PostgreSQL' if is_production else 'SQLite',
+    }
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        info['db_connection'] = 'OK'
+    except Exception as e:
+        info['db_connection'] = f'ERROR: {e}'
+
+    try:
+        info['tables'] = {}
+        for table in ['user', 'habit', 'user_habit', 'user_progress', 'shop_item',
+                       'coin_transaction', 'category', 'transaction', 'savings_goal']:
+            try:
+                count = db.session.execute(db.text(f'SELECT COUNT(*) FROM "{table}"')).scalar()
+                info['tables'][table] = count
+            except Exception as e:
+                info['tables'][table] = f'ERROR: {e}'
+
+        # Buscar usuario test
+        test_user = User.query.filter_by(email='test@test.com').first()
+        if test_user:
+            info['test_user'] = {
+                'id': test_user.id,
+                'name': test_user.name,
+                'email': test_user.email,
+                'avatar': test_user.avatar,
+            }
+            prog = UserProgress.query.filter_by(user_id=test_user.id).first()
+            info['test_user_progress'] = {
+                'coins': prog.coins if prog else 'N/A',
+                'streak': prog.streak if prog else 'N/A',
+            }
+        else:
+            info['test_user'] = 'NO EXISTE'
+            info['test_user_progress'] = 'N/A'
+
+        # Buscar cualquier usuario
+        all_users = User.query.all()
+        info['total_users'] = len(all_users)
+    except Exception as e:
+        info['query_error'] = f'{type(e).__name__}: {e}'
+
+    return jsonify(info)
 
 
 if __name__ == "__main__":
