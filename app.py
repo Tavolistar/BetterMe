@@ -21,7 +21,11 @@ is_production = os.getenv('RENDER', '') == 'true'
 if is_production:
     app = Flask(__name__)
     # Render provee DATABASE_URL automáticamente si agregas PostgreSQL
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+    database_url = os.getenv('DATABASE_URL', '')
+    # SQLAlchemy 2.x requiere postgresql:// pero Render da postgres://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
     app = Flask(__name__, instance_path=os.path.join(basedir, 'instance'))
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///betterme.db')
@@ -114,13 +118,17 @@ with app.app_context():
         # Crear usuario test
         test_user = User(
             email='test@test.com',
-            password=generate_password_hash('test123'),
-            nickname='TestUser',
+            password_hash=generate_password_hash('test123'),
+            name='TestUser',
             avatar='avatar_1.svg',
-            coins=500,
             created_at=date.today() - timedelta(days=60)
         )
         db.session.add(test_user)
+        db.session.commit()
+
+        # Crear progreso inicial con monedas
+        progress = UserProgress(user_id=test_user.id, coins=500)
+        db.session.add(progress)
         db.session.commit()
 
         # Asignar hábitos al usuario de prueba
@@ -138,7 +146,7 @@ with app.app_context():
                     log = HabitLog(
                         user_id=test_user.id,
                         habit_id=h.id,
-                        logged_date=d,
+                        date=d,
                         completed=True
                     )
                     db.session.add(log)

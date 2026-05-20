@@ -4,11 +4,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="BetterMe - Tu compañero de hábitos diarios con gamificación">
+    <meta name="description" content="BetterMe - Tu sistema de hábitos con gamificación. Convierte tus intenciones en hábitos reales.">
     <meta name="author" content="BetterMe">
-    <title>BetterMe - Tu compañero de hábitos diarios</title>
-
-    <!-- Tailwind CSS via CDN -->
+    <title>BetterMe - Toma las riendas de tu vida</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
@@ -18,154 +17,408 @@
                     primary: '#4e73df',
                     secondary: '#1cc88a',
                     accent: '#f6c23e',
-                    surface: '#f8f9fc',
-                    text: '#5a5c69',
+                    dark: '#0f0f1a',
                 },
                 fontFamily: {
-                    nunito: ['Nunito', 'sans-serif'],
-                },
-                borderRadius: {
-                    'xl': '12px',
+                    heading: ['Poppins', 'sans-serif'],
+                    body: ['Inter', 'sans-serif'],
                 }
             }
         }
     }
     </script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { font-family: 'Nunito', sans-serif; }
+        :root {
+            --primary: #4e73df;
+            --primary-dark: #224abe;
+            --secondary: #1cc88a;
+            --accent: #f6c23e;
+            --dark: #0f0f1a;
+            --darker: #070712;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.10);
+            --text-light: #e8e8f0;
+            --text-muted: #8888a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { margin: 0; padding: 0; }
-        .gradient-hero {
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
         }
-        .gradient-cta {
-            background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(78, 115, 223, 0.15);
-        }
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #4e73df;
-        }
-        .btn-primary {
-            background: #4e73df;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            background: #224abe;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(78, 115, 223, 0.35);
-        }
-        .btn-outline {
-            border: 2px solid white;
-            transition: all 0.3s ease;
-        }
-        .btn-outline:hover {
-            background: white;
-            color: #4e73df;
-            transform: translateY(-2px);
-        }
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            font-size: 1.5rem;
-        }
-        .testimonial-card {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .testimonial-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .testimonial-card::before {
-            content: '"';
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        /* ─── HERO ANIMATED BACKGROUND ─── */
+        .hero-bg {
             position: absolute;
-            top: -10px;
-            left: 20px;
-            font-size: 4rem;
-            color: #4e73df;
-            opacity: 0.15;
-            font-family: Georgia, serif;
+            inset: 0;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 80% 60% at 0% 20%, rgba(78, 115, 223, 0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 100% 0%, rgba(28, 200, 138, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(246, 194, 62, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 70% 60% at 30% 100%, rgba(78, 115, 223, 0.10) 0%, transparent 50%),
+                var(--dark);
+        }
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* ─── FLOATING GEOMETRIC SHAPES ─── */
+        .float-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .float-shape-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(78,115,223,0.3), transparent);
+            top: -150px; right: -100px;
+            animation: float1 20s ease-in-out infinite;
+        }
+        .float-shape-2 {
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(28,200,138,0.2), transparent);
+            bottom: -80px; left: -80px;
+            animation: float2 25s ease-in-out infinite;
+        }
+        .float-shape-3 {
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(246,194,62,0.15), transparent);
+            top: 40%; left: 15%;
+            animation: float1 18s ease-in-out infinite reverse;
+        }
+        .float-shape-4 {
+            width: 150px; height: 150px;
+            border: 2px solid rgba(78,115,223,0.15);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            top: 25%; right: 20%;
+            animation: morphFloat 15s ease-in-out infinite;
+        }
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, -30px) scale(1.08); }
+        }
+        @keyframes morphFloat {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg) translateY(0); }
+            33% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: rotate(20deg) translateY(-20px); }
+            66% { border-radius: 30% 30% 70% 70% / 70% 30% 70% 30%; transform: rotate(-10deg) translateY(15px); }
+        }
+
+        /* ─── TYPING CURSOR ─── */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 0.8s step-end infinite;
+            color: var(--accent);
+            font-weight: 300;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ─── REVEAL ANIMATIONS ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.85);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-scale.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .reveal-stagger > * {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0s; }
+        .reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.1s; }
+        .reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.2s; }
+        .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.3s; }
+        .reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.4s; }
+        .reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.5s; }
+        .reveal-stagger.visible > * {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-1 { transition-delay: 0.1s !important; }
+        .delay-2 { transition-delay: 0.2s !important; }
+        .delay-3 { transition-delay: 0.3s !important; }
+        .delay-4 { transition-delay: 0.4s !important; }
+        .delay-5 { transition-delay: 0.5s !important; }
+
+        /* ─── GLASSMORPHISM ─── */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(78, 115, 223, 0.3);
+            box-shadow: 0 20px 60px rgba(78, 115, 223, 0.15);
+        }
+
+        /* ─── CARD 3D TILT ─── */
+        .tilt-card {
+            perspective: 1000px;
+        }
+        .tilt-card-inner {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+
+        /* ─── GLOW TEXT ─── */
+        .glow-text {
+            background: linear-gradient(135deg, #4e73df, #1cc88a, #f6c23e);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ─── BUTTONS ─── */
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, #4e73df, #1cc88a, #f6c23e, #4e73df);
+            background-size: 300% 300%;
+            animation: borderGlow 4s linear infinite;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .btn-glow:hover::before { opacity: 1; }
+        .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(78, 115, 223, 0.35); }
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ─── COUNTER NUMBERS ─── */
+        .counter-num {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             line-height: 1;
         }
-        .demo-placeholder {
-            background: linear-gradient(135deg, #e8ecf4 0%, #d5dce8 100%);
+
+        /* ─── STEP CONNECTORS ─── */
+        .step-connector {
+            position: absolute;
+            top: 40px;
+            right: -40px;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(78,115,223,0.3), transparent);
+        }
+        @media (max-width: 768px) {
+            .step-connector { display: none; }
+        }
+
+        /* ─── TESTIMONIAL QUOTES ─── */
+        .testimonial-quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        /* ─── PARALLAX SHINE ─── */
+        .shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.03) 55%, transparent 60%);
+            animation: shineMove 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes shineMove {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        /* ─── GRADIENT DIVIDERS ─── */
+        .divider-gradient {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(78,115,223,0.3), rgba(28,200,138,0.3), transparent);
+        }
+
+        /* ─── NAVBAR ─── */
+        .navbar-scrolled {
+            background: rgba(15, 15, 26, 0.85) !important;
+            backdrop-filter: blur(24px) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3) !important;
+        }
+
+        /* ─── HERO MOCKUP IMAGE ─── */
+        .hero-mockup {
             border-radius: 16px;
-            border: 2px dashed #b0b9cc;
-            min-height: 400px;
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.4),
+                0 0 0 1px rgba(255,255,255,0.06);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hero-mockup:hover {
+            transform: translateY(-8px) scale(1.01);
+        }
+
+        /* ─── SECTION DIVIDER WAVES ─── */
+        .wave-divider {
+            position: relative;
+            height: 120px;
+            margin-top: -120px;
+        }
+        .wave-divider svg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 120px;
+        }
+
+        /* ─── PILL TAGS ─── */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(78,115,223,0.12);
+            color: #8899dd;
+            border: 1px solid rgba(78,115,223,0.15);
+            transition: all 0.3s ease;
+        }
+        .pill:hover {
+            background: rgba(78,115,223,0.2);
+            color: #aabbff;
+        }
+
+        /* ─── LOADING SKELETON FOR IMAGES ─── */
+        .img-placeholder {
+            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%);
+            background-size: 200% 200%;
+            animation: placeholderShimmer 2s ease-in-out infinite;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            color: #7a8299;
-            text-align: center;
-            padding: 2rem;
+            color: rgba(255,255,255,0.25);
+            min-height: 200px;
+            border: 1px dashed rgba(255,255,255,0.10);
         }
-        .step-card {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            text-align: center;
+        @keyframes placeholderShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-img-container {
             position: relative;
         }
-        .step-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        .hero-img-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(78,115,223,0.2), transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(40px);
+            pointer-events: none;
         }
-        .step-number {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+
+        /* ─── FEATURE ICON WRAPPER ─── */
+        .feature-icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 1.2rem;
-            margin: 0 auto 1rem;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-        .animate-fade-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
-        .animate-fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
-        .animate-fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
-        .animate-fade-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
-        /* Zoom en imagen Canvas */
-        .canvas-zoom-container {
-            overflow: hidden;
-            cursor: zoom-in;
-        }
-        .canvas-zoom-img {
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transform-origin: center center;
-        }
-        .canvas-zoom-container:hover .canvas-zoom-img {
-            transform: scale(1.8);
+        .glass-card:hover .feature-icon-wrap {
+            transform: scale(1.1);
+            border-radius: 12px;
         }
     </style>
 </head>
@@ -175,14 +428,14 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="fixed top-4 right-4 z-[100] max-w-sm">
-                    <div class="bg-white rounded-lg shadow-xl border-l-4 
-                        {% if category == 'success' %}border-l-green-500
-                        {% elif category == 'danger' %}border-l-red-500
-                        {% elif category == 'warning' %}border-l-yellow-500
-                        {% else %}border-l-blue-500{% endif %} p-4 flex justify-between items-start">
-                        <p class="text-sm text-gray-700">{{ message }}</p>
-                        <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-gray-400 hover:text-gray-600">
+                <div class="fixed top-4 right-4 z-[100] max-w-sm animate-fade-in-down">
+                    <div class="glass rounded-xl border-l-4
+                        {% if category == 'success' %}border-l-[#1cc88a]
+                        {% elif category == 'danger' %}border-l-[#e74a3b]
+                        {% elif category == 'warning' %}border-l-[#f6c23e]
+                        {% else %}border-l-[#4e73df]{% endif %} p-4 flex justify-between items-start">
+                        <p class="text-sm text-[#e0e0f0]">{{ message }}</p>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-[#6666a0] hover:text-white transition">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -192,341 +445,377 @@
     {% endwith %}
 
     <!-- ====== NAVBAR ====== -->
-    <nav class="fixed w-full z-50 gradient-hero shadow-lg">
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <a href="{{ url_for('index') }}" class="flex items-center space-x-2 text-white">
-                    <i class="fas fa-leaf text-2xl" style="color: #1cc88a;"></i>
-                    <span class="text-xl font-extrabold tracking-tight">BetterMe</span>
+            <div class="flex items-center justify-between h-18 py-3">
+                <a href="{{ url_for('index') }}" class="flex items-center gap-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#4e73df] to-[#1cc88a] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-leaf text-white text-sm"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white tracking-tight">BetterMe</span>
                 </a>
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <a href="#como-funciona" class="text-white/90 hover:text-white transition text-sm font-semibold">¿Cómo funciona?</a>
-                    <a href="#funcionalidades" class="text-white/90 hover:text-white transition text-sm font-semibold">Funcionalidades</a>
-                    <a href="#testimonios" class="text-white/90 hover:text-white transition text-sm font-semibold">Testimonios</a>
-                    <a href="{{ url_for('login') }}" class="text-white/90 hover:text-white transition text-sm font-semibold">Iniciar sesión</a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#como-funciona" class="text-sm font-medium text-[#8888a0] hover:text-white transition-all duration-300 relative group">
+                        Cómo funciona
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#4e73df] to-[#1cc88a] transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#funcionalidades" class="text-sm font-medium text-[#8888a0] hover:text-white transition-all duration-300 relative group">
+                        Funcionalidades
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#4e73df] to-[#1cc88a] transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#testimonios" class="text-sm font-medium text-[#8888a0] hover:text-white transition-all duration-300 relative group">
+                        Testimonios
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#4e73df] to-[#1cc88a] transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="{{ url_for('login') }}" class="text-sm font-semibold text-[#bbb0dd] hover:text-white transition-colors">
+                        Iniciar sesión
+                    </a>
                     <a href="{{ url_for('register') }}"
-                       class="bg-white text-[#4e73df] px-5 py-2 rounded-full text-sm font-bold hover:shadow-lg transition-all hover:-translate-y-0.5">
-                        Registrarse
+                       class="btn-glow relative inline-flex items-center gap-2 bg-gradient-to-r from-[#4e73df] to-[#224abe] text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all">
+                        Comenzar gratis
+                        <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
-                <!-- Mobile button -->
                 <button class="md:hidden text-white text-2xl" onclick="toggleMobileMenu()">
                     <i class="fas fa-bars" id="menuIcon"></i>
                 </button>
             </div>
         </div>
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden bg-[#3a5fc8] pb-4 px-4 space-y-2">
-            <a href="#como-funciona" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">¿Cómo funciona?</a>
-            <a href="#funcionalidades" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">Funcionalidades</a>
-            <a href="#testimonios" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">Testimonios</a>
-            <a href="{{ url_for('login') }}" onclick="toggleMobileMenu()" class="block text-white/90 py-2 text-sm font-semibold">Iniciar sesión</a>
-            <a href="{{ url_for('register') }}" onclick="toggleMobileMenu()"
-               class="block bg-white text-[#4e73df] px-5 py-2 rounded-full text-sm font-bold text-center">
-                Registrarse
-            </a>
+        <div id="mobileMenu" class="hidden md:hidden glass border-t border-white/5">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#como-funciona" onclick="toggleMobileMenu()" class="block text-[#8888a0] py-2 text-sm font-medium">Cómo funciona</a>
+                <a href="#funcionalidades" onclick="toggleMobileMenu()" class="block text-[#8888a0] py-2 text-sm font-medium">Funcionalidades</a>
+                <a href="#testimonios" onclick="toggleMobileMenu()" class="block text-[#8888a0] py-2 text-sm font-medium">Testimonios</a>
+                <a href="{{ url_for('login') }}" onclick="toggleMobileMenu()" class="block text-[#bbb0dd] py-2 text-sm font-semibold">Iniciar sesión</a>
+                <a href="{{ url_for('register') }}" onclick="toggleMobileMenu()"
+                   class="block text-center bg-gradient-to-r from-[#4e73df] to-[#224abe] text-white px-5 py-2.5 rounded-full text-sm font-bold">
+                    Comenzar gratis
+                </a>
+            </div>
         </div>
     </nav>
 
-    <!-- ====== HERO SECTION ====== -->
-    <section class="gradient-hero pt-20 pb-16 md:pt-28 md:pb-20 relative overflow-hidden">
-        <!-- Decorative circles -->
-        <div class="absolute top-20 left-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-10 right-10 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-        <div class="absolute top-40 right-1/4 w-40 h-40 bg-[#1cc88a]/20 rounded-full blur-2xl"></div>
+    <!-- ====== HERO ====== -->
+    <section class="relative min-h-screen flex items-center overflow-hidden">
+        <div class="hero-bg"></div>
+        <div class="float-shape float-shape-1"></div>
+        <div class="float-shape float-shape-2"></div>
+        <div class="float-shape float-shape-3"></div>
+        <div class="float-shape float-shape-4"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <!-- Left: Text -->
-                <div class="text-center md:text-left">
-                    <div class="inline-flex items-center bg-white/15 backdrop-blur-sm text-white text-sm font-semibold px-4 py-1.5 rounded-full mb-6 animate-fade-in">
-                        <i class="fas fa-sparkles mr-2" style="color: #f6c23e;"></i>
-                        Tu sistema de hábitos con gamificación
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-24 pb-16 md:pt-32 md:pb-20">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div>
+                    <div class="reveal visible">
+                        <span class="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full border border-[rgba(78,115,223,0.2)] bg-[rgba(78,115,223,0.08)] text-[#8899dd]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#1cc88a] animate-pulse"></span>
+                            Tu sistema de hábitos con gamificación
+                        </span>
                     </div>
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 animate-fade-in animate-fade-in-delay-1">
-                        Convierte tus buenas intenciones en
-                        <span style="color: #f6c23e;">hábitos reales</span>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.05] mt-8 mb-6">
+                        <span class="text-white">Es hora de tomar</span><br>
+                        <span class="text-white">las riendas de</span><br>
+                        <span class="typing-cursor glow-text">tu vida</span>
                     </h1>
-                    <p class="text-lg md:text-xl text-white/80 mb-8 max-w-xl mx-auto md:mx-0 animate-fade-in animate-fade-in-delay-2">
-                        BetterMe usa gamificación y psicología conductual para ayudarte a ser constante.
-                        Cada hábito cumplido = monedas. Cada día consistente = racha que crece.
-                        <strong class="text-white">Empieza hoy.</strong>
+
+                    <p class="text-lg md:text-xl text-[#8888a0] leading-relaxed max-w-lg mb-10">
+                        Convierte tus buenas intenciones en hábitos reales.
+                        <span class="text-[#c0c0e0] font-semibold">BetterMe</span> usa gamificación y psicología conductual
+                        para que la consistencia sea tu superpoder.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in animate-fade-in-delay-3">
+
+                    <div class="flex flex-col sm:flex-row gap-4">
                         <a href="{{ url_for('register') }}"
-                           class="btn-primary text-white px-8 py-3.5 rounded-full text-lg font-bold inline-flex items-center justify-center gap-2">
-                            Comenzar gratis
+                           class="btn-glow relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#4e73df] to-[#224abe] text-white px-9 py-4 rounded-full text-lg font-bold shadow-xl shadow-[#4e73df]/20">
+                            Empieza tu transformación
                             <i class="fas fa-arrow-right text-sm"></i>
                         </a>
+
                     </div>
-                    <div class="flex items-center gap-6 mt-8 justify-center md:justify-start text-white/60 text-sm animate-fade-in animate-fade-in-delay-4">
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Sin tarjeta</span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Gratis siempre</span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check-circle" style="color: #1cc88a;"></i> Cancela cuando quieras</span>
+
+                    <div class="flex flex-wrap items-center gap-6 mt-10 text-xs text-[#6666a0]">
+                        <span class="flex items-center gap-2"><i class="fas fa-check-circle text-[#1cc88a]"></i> Sin tarjeta</span>
+                        <span class="flex items-center gap-2"><i class="fas fa-check-circle text-[#1cc88a]"></i> Gratis siempre</span>
+                        <span class="flex items-center gap-2"><i class="fas fa-check-circle text-[#1cc88a]"></i> Sin compromiso</span>
                     </div>
                 </div>
-                <!-- Right: Image Placeholder -->
-                <div class="animate-fade-in animate-fade-in-delay-2">
-                    <img src="{{ url_for('static', filename='img/dashboard-preview.png') }}"
-                         alt="Dashboard de BetterMe"
-                         class="w-full rounded-2xl shadow-2xl border border-white/10"
-                         onerror="this.parentElement.innerHTML=`
-                            <div class=\'demo-placeholder shadow-2xl\'>
-                                <i class=\'fas fa-leaf text-5xl mb-4\' style=\'color: #4e73df;\'></i>
-                                <p class=\'text-lg font-bold\' style=\'color: #5a5c69;\'>IMAGEN DEMO</p>
-                                <p style=\'color: #7a8299;\' class=\'text-sm max-w-xs\'>Coloca tu imagen como static/img/dashboard-preview.png</p>
-                            </div>`">
+
+                <div class="reveal-right visible hero-img-container">
+                    <div class="hero-img-glow"></div>
+                    <div class="relative z-10">
+                        <img src="{{ url_for('static', filename='img/dashboard-preview.png') }}"
+                             alt="Dashboard BetterMe"
+                             class="hero-mockup w-full rounded-2xl"
+                             onerror="this.parentElement.innerHTML=`
+                                <div class=\'img-placeholder p-12\'>
+                                    <i class=\'fas fa-leaf text-5xl mb-4 opacity-50\'></i>
+                                    <p class=\'text-lg font-bold opacity-60\'>Dashboard Preview</p>
+                                    <p class=\'text-sm opacity-40 mt-2\'>static/img/dashboard-preview.png</p>
+                                </div>`">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+
 
     <!-- ====== CÓMO FUNCIONA ====== -->
-    <section id="como-funciona" class="py-16 md:py-24" style="background: #f8f9fc;">
+    <section id="como-funciona" class="py-28 md:py-36 relative">
+        <div class="divider-gradient absolute top-0 left-0 right-0"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <span class="text-sm font-bold uppercase tracking-widest" style="color: #4e73df;">Cómo funciona</span>
-                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
-                    Tres pasos para transformar tu vida
+            <div class="text-center max-w-2xl mx-auto mb-20">
+                <span class="text-xs font-semibold tracking-[0.2em] uppercase text-[#6666a0] reveal">El Método</span>
+                <h2 class="text-3xl md:text-5xl font-black text-white mt-4 reveal delay-1">
+                    Tres pasos para <span class="glow-text">transformar</span> tu vida
                 </h2>
-                <p class="mt-3" style="color: #858796;">Simple, intuitivo y motivador. Así de fácil.</p>
+                <p class="text-[#8888a0] mt-4 reveal delay-2">Simple, poderoso, adictivo. Así de fácil.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Step 1 -->
-                <div class="step-card">
-                    <div class="step-number" style="background: #e8f5f0;">
-                        <span style="color: #1cc88a;">1</span>
+            <div class="grid md:grid-cols-3 gap-8 md:gap-12 reveal-stagger">
+                <div class="glass-card p-8 md:p-10 text-center relative">
+                    <div class="step-connector"></div>
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#4e73df] to-[#224abe] flex items-center justify-center mx-auto mb-6 text-white font-black text-lg shadow-lg shadow-[#4e73df]/20">
+                        1
                     </div>
-                    <div class="feature-icon mx-auto mb-4" style="background: #e8f5f0; color: #1cc88a;">
+                    <div class="w-14 h-14 rounded-2xl bg-[rgba(28,200,138,0.12)] flex items-center justify-center mx-auto mb-6 text-[#1cc88a] text-2xl">
                         <i class="fas fa-check-double"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2" style="color: #5a5c69;">Marca tus hábitos</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">
-                        Registra tus hábitos diarios y márcalos como completados. Desde "Beber agua" hasta "Meditar 10 min".
+                    <h3 class="text-xl font-bold text-white mb-3">Marca tus hábitos</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">
+                        Registra tus hábitos diarios y márcalos como completados. Desde un vaso de agua hasta una maratón.
                     </p>
                 </div>
-                <!-- Step 2 -->
-                <div class="step-card">
-                    <div class="step-number" style="background: #fef6e6;">
-                        <span style="color: #f6c23e;">2</span>
+                <div class="glass-card p-8 md:p-10 text-center relative">
+                    <div class="step-connector"></div>
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#f6c23e] to-[#e0a800] flex items-center justify-center mx-auto mb-6 text-white font-black text-lg shadow-lg shadow-[#f6c23e]/20">
+                        2
                     </div>
-                    <div class="feature-icon mx-auto mb-4" style="background: #fef6e6; color: #f6c23e;">
+                    <div class="w-14 h-14 rounded-2xl bg-[rgba(246,194,62,0.12)] flex items-center justify-center mx-auto mb-6 text-[#f6c23e] text-2xl">
                         <i class="fas fa-coins"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2" style="color: #5a5c69;">Gana monedas</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">
-                        Cada hábito cumplido te da monedas. Mantén tu racha y acumula recompensas.
+                    <h3 class="text-xl font-bold text-white mb-3">Gana monedas</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">
+                        Cada hábito cumplido te da monedas. Cada racha las multiplica. Juega, gana, repite.
                     </p>
                 </div>
-                <!-- Step 3 -->
-                <div class="step-card">
-                    <div class="step-number" style="background: #e8edfc;">
-                        <span style="color: #4e73df;">3</span>
+                <div class="glass-card p-8 md:p-10 text-center">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#1cc88a] to-[#14a06e] flex items-center justify-center mx-auto mb-6 text-white font-black text-lg shadow-lg shadow-[#1cc88a]/20">
+                        3
                     </div>
-                    <div class="feature-icon mx-auto mb-4" style="background: #e8edfc; color: #4e73df;">
+                    <div class="w-14 h-14 rounded-2xl bg-[rgba(78,115,223,0.12)] flex items-center justify-center mx-auto mb-6 text-[#4e73df] text-2xl">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2" style="color: #5a5c69;">Mira tu progreso</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">
-                        Dashboard con estadísticas, calendario de rachas y gráfica de cumplimiento. Todo en un solo lugar.
+                    <h3 class="text-xl font-bold text-white mb-3">Mira tu evolución</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">
+                        Dashboard inteligente con estadísticas, calendario de rachas y gráficas. Todo en un solo lugar.
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ====== FUNCIONALIDADES DESTACADAS ====== -->
-    <section id="funcionalidades" class="py-16 md:py-24 bg-white">
+    <!-- ====== FUNCIONALIDADES ====== -->
+    <section id="funcionalidades" class="py-28 md:py-36 relative">
+        <div class="divider-gradient absolute top-0 left-0 right-0"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <span class="text-sm font-bold uppercase tracking-widest" style="color: #1cc88a;">Funcionalidades</span>
-                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
-                    Todo lo que necesitas para ser constante
+            <div class="text-center max-w-2xl mx-auto mb-20">
+                <span class="text-xs font-semibold tracking-[0.2em] uppercase text-[#6666a0] reveal">Funcionalidades</span>
+                <h2 class="text-3xl md:text-5xl font-black text-white mt-4 reveal delay-1">
+                    Todo lo que necesitas para <span class="glow-text">ser constante</span>
                 </h2>
-                <p class="mt-3" style="color: #858796;">Herramientas diseñadas para mantenerte motivado todos los días.</p>
+                <p class="text-[#8888a0] mt-4 reveal delay-2">Herramientas diseñadas para mantenerte motivado 365 días al año.</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Card 1 -->
-                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                    <div class="feature-icon mb-4" style="background: #e8edfc; color: #4e73df;">
-                        <i class="fas fa-gamepad"></i>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 reveal-stagger">
+                <div class="glass-card p-6 tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="feature-icon-wrap mb-5" style="background: rgba(78,115,223,0.12); color: #4e73df;">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Gamificación real</h3>
+                        <p class="text-sm text-[#8888a0] leading-relaxed">Monedas, rachas, niveles y avatares. Cada hábito cumplido es una victoria.</p>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <span class="pill"><i class="fas fa-coins"></i> Monedas</span>
+                            <span class="pill"><i class="fas fa-fire"></i> Rachas</span>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Gamificación real</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">Monedas, rachas, niveles. La consistencia se recompensa.</p>
                 </div>
-                <!-- Card 2 -->
-                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                    <div class="feature-icon mb-4" style="background: #fef6e6; color: #f6c23e;">
+                <div class="glass-card p-6">
+                    <div class="feature-icon-wrap mb-5" style="background: rgba(28,200,138,0.12); color: #1cc88a;">
                         <i class="fas fa-piggy-bank"></i>
                     </div>
-                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Metas de ahorro</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">Ahorra dinero mientras cumples hábitos. Único en su tipo.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">Metas de ahorro</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">Ahorra dinero mientras cumples hábitos. Categoriza, establece metas, visualiza tu capital.</p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="pill"><i class="fas fa-chart-pie"></i> Categorías</span>
+                        <span class="pill"><i class="fas fa-bullseye"></i> Metas</span>
+                    </div>
                 </div>
-                <!-- Card 3 -->
-                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                    <div class="feature-icon mb-4" style="background: #e8f5f0; color: #1cc88a;">
+                <div class="glass-card p-6">
+                    <div class="feature-icon-wrap mb-5" style="background: rgba(246,194,62,0.12); color: #f6c23e;">
                         <i class="fas fa-chart-bar"></i>
                     </div>
-                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Dashboard visual</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">Estadísticas claras de tu evolución. Ve tu mejora día a día.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">Dashboard inteligente</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">Gráficas de cumplimiento, calendario de rachas, estadísticas claras de tu evolución diaria.</p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="pill"><i class="fas fa-calendar"></i> Calendario</span>
+                        <span class="pill"><i class="fas fa-chart-line"></i> Stats</span>
+                    </div>
                 </div>
-                <!-- Card 4 -->
-                <div class="card-hover bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                    <div class="feature-icon mb-4" style="background: #fce8e8; color: #e74a3b;">
+                <div class="glass-card p-6">
+                    <div class="feature-icon-wrap mb-5" style="background: rgba(232,74,59,0.12); color: #e84a3b;">
                         <i class="fas fa-user-astronaut"></i>
                     </div>
-                    <h3 class="text-lg font-bold mb-2" style="color: #5a5c69;">Avatares personalizables</h3>
-                    <p style="color: #858796;" class="text-sm leading-relaxed">Desbloquea avatares con tus monedas. Hazlo tuyo.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">Avatares exclusivos</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">Desbloquea avatares únicos con tus monedas. Personaliza tu perfil y muestra tu progreso.</p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="pill"><i class="fas fa-store"></i> Tienda</span>
+                        <span class="pill"><i class="fas fa-palette"></i> Personaliza</span>
+                    </div>
+                </div>
+                <div class="glass-card p-6">
+                    <div class="feature-icon-wrap mb-5" style="background: rgba(78,115,223,0.12); color: #4e73df;">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Historial completo</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">Cada moneda ganada y gastada queda registrada. Transparencia total de tu progreso.</p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="pill"><i class="fas fa-list"></i> Transacciones</span>
+                        <span class="pill"><i class="fas fa-search"></i> Filtros</span>
+                    </div>
+                </div>
+                <div class="glass-card p-6">
+                    <div class="feature-icon-wrap mb-5" style="background: rgba(28,200,138,0.12); color: #1cc88a;">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Premium (próximamente)</h3>
+                    <p class="text-sm text-[#8888a0] leading-relaxed">Estadísticas avanzadas, más avatares, temas exclusivos y herramientas de productividad.</p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="pill"><i class="fas fa-star"></i> Pronto</span>
+                        <span class="pill"><i class="fas fa-gem"></i> Exclusivo</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ====== MODELO DE NEGOCIO CANVAS ====== -->
-    <section id="modelo-canvas" class="py-16 md:py-24" style="background: #f8f9fc;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <span class="text-sm font-bold uppercase tracking-widest" style="color: #4e73df;">Modelo de Negocio</span>
-                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
-                    Canvas BetterMe
-                </h2>
-                <p class="mt-3" style="color: #858796;">Así es como BetterMe genera valor y sostenibilidad.</p>
-            </div>
-            <div class="flex justify-center">
-                <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-4 md:p-8 border border-gray-100 canvas-zoom-container">
-                    <img src="{{ url_for('static', filename='img/canvas.png') }}"
-                         alt="Modelo de Negocio Canvas"
-                         class="w-full rounded-xl canvas-zoom-img"
-                         onerror="this.parentElement.innerHTML=`
-                            <div class=\'text-center py-16\'>
-                                <i class=\'fas fa-image text-6xl mb-4\' style=\'color: #b0b9cc;\'></i>
-                                <p class=\'text-lg font-bold\' style=\'color: #5a5c69;\'>IMAGEN CANVAS</p>
-                                <p style=\'color: #858796;\' class=\'text-sm\'>Coloca tu imagen como <strong>static/img/canvas.png</strong></p>
-                            </div>`">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ====== BENEFICIOS REALES ====== -->
-    <section class="py-16 md:py-20 gradient-hero relative overflow-hidden">
-        <div class="absolute inset-0 bg-white/5"></div>
+    <!-- ====== GAMIFICATION SPOTLIGHT ====== -->
+    <section class="py-28 md:py-36 relative overflow-hidden">
+        <div class="divider-gradient absolute top-0 left-0 right-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(78,115,223,0.03)] to-transparent"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-white">
-                    <i class="fas fa-gem mr-3"></i> Todo en un solo lugar
-                </h2>
-                <p class="text-white/70 mt-2">Las herramientas que necesitas para transformar tu vida.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Card 1: Hábitos -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-1 group">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-check-double text-3xl text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-white">Seguimiento de Hábitos</h3>
-                    <p class="text-white/60 text-sm mt-3 leading-relaxed">
-                        Registra tus hábitos diarios, lleva un historial por fechas y construye rachas impecables.
-                        Visualiza tu progreso con gráficas detalladas de cumplimiento.
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <span class="text-xs font-semibold tracking-[0.2em] uppercase text-[#6666a0] reveal">Gamificación</span>
+                    <h2 class="text-3xl md:text-5xl font-black text-white mt-4 reveal delay-1 leading-tight">
+                        Cada hábito es una<br>
+                        <span class="glow-text">misión cumplida</span>
+                    </h2>
+                    <p class="text-[#8888a0] mt-6 leading-relaxed reveal delay-2">
+                        En BetterMe, cada acción cuenta. Completaste un hábito → ganaste monedas.
+                        Mantuviste tu racha 7 días → bonus de experiencia. Desbloqueaste un logro → nuevo avatar.
                     </p>
-                    <div class="mt-4 flex flex-wrap justify-center gap-2">
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Rachas</span>
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Gráficas</span>
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Historial</span>
+                    <div class="space-y-4 mt-8 reveal delay-3">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-[rgba(28,200,138,0.12)] flex items-center justify-center flex-shrink-0 text-[#1cc88a] text-sm mt-0.5">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-semibold text-sm">Sistema de rachas</p>
+                                <p class="text-xs text-[#6666a0]">Cada día consecutivo multiplica tus recompensas</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-[rgba(246,194,62,0.12)] flex items-center justify-center flex-shrink-0 text-[#f6c23e] text-sm mt-0.5">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-semibold text-sm">Tienda de recompensas</p>
+                                <p class="text-xs text-[#6666a0]">Canjea tus monedas por avatares y personalización</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-[rgba(78,115,223,0.12)] flex items-center justify-center flex-shrink-0 text-[#4e73df] text-sm mt-0.5">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-semibold text-sm">Estadísticas en tiempo real</p>
+                                <p class="text-xs text-[#6666a0]">Dashboard con gráficas que se actualizan al instante</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- Card 2: Ahorros -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-1 group">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-piggy-bank text-3xl text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-white">Control de Ahorros</h3>
-                    <p class="text-white/60 text-sm mt-3 leading-relaxed">
-                        Gestiona tus ingresos y gastos por categorías. Establece metas de ahorro con fecha límite
-                        y da seguimiento visual con gráficas de evolución.
-                    </p>
-                    <div class="mt-4 flex flex-wrap justify-center gap-2">
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Metas</span>
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Categorías</span>
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Dashboard</span>
-                    </div>
-                </div>
-                <!-- Card 3: Gamificación -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-1 group">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-trophy text-3xl text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-white">Gamificación y Recompensas</h3>
-                    <p class="text-white/60 text-sm mt-3 leading-relaxed">
-                        Gana monedas por completar hábitos y metas. Canjéalas por avatares exclusivos
-                        en la tienda y personaliza tu perfil.
-                    </p>
-                    <div class="mt-4 flex flex-wrap justify-center gap-2">
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Monedas</span>
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Avatares</span>
-                        <span class="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full">Tienda</span>
-                    </div>
+                <div class="reveal-right">
+                    <img src="{{ url_for('static', filename='img/dashboard-preview.png') }}"
+                         alt="Gamificación BetterMe"
+                         class="hero-mockup w-full rounded-2xl"
+                         onerror="this.parentElement.innerHTML=`
+                            <div class=\'img-placeholder p-12\'>
+                                <i class=\'fas fa-trophy text-5xl mb-4 opacity-50\'></i>
+                                <p class=\'text-lg font-bold opacity-60\'>Gamificación Preview</p>
+                                <p class=\'text-sm opacity-40 mt-2\'>static/img/gamification-preview.png</p>
+                            </div>`">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- ====== TESTIMONIOS ====== -->
-    <section id="testimonios" class="py-16 md:py-24" style="background: #f8f9fc;">
+    <section id="testimonios" class="py-28 md:py-36 relative">
+        <div class="divider-gradient absolute top-0 left-0 right-0"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <span class="text-sm font-bold uppercase tracking-widest" style="color: #4e73df;">Testimonios</span>
-                <h2 class="text-3xl md:text-4xl font-extrabold mt-2" style="color: #5a5c69;">
-                    Lo que dicen nuestros usuarios
+            <div class="text-center max-w-2xl mx-auto mb-20">
+                <span class="text-xs font-semibold tracking-[0.2em] uppercase text-[#6666a0] reveal">Testimonios</span>
+                <h2 class="text-3xl md:text-5xl font-black text-white mt-4 reveal delay-1">
+                    Los que ya <span class="glow-text">tomaron las riendas</span>
                 </h2>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="testimonial-card">
-                    <div class="flex items-center gap-1 mb-3" style="color: #f6c23e;">
+
+            <div class="grid md:grid-cols-3 gap-6 reveal-stagger">
+                <div class="glass-card p-8">
+                    <div class="flex items-center gap-1 mb-4 text-[#f6c23e] text-sm">
                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
-                    <p class="text-sm leading-relaxed mb-4" style="color: #5a5c69;">
-                        "Llevaba años intentando ser más organizado. BetterMe me dio el sistema que necesitaba. Llevo 47 días de racha."
+                    <p class="testimonial-quote text-[0.95rem] leading-relaxed text-[#c0c0d0] mb-6">
+                        "Llevaba años intentando ser constante. BetterMe me dio el sistema que necesitaba. Llevo 47 días de racha imparable."
                     </p>
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background: #4e73df;">CM</div>
+                        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-[#4e73df] to-[#224abe] flex items-center justify-center text-white font-bold text-sm">CM</div>
                         <div>
-                            <p class="font-bold text-sm" style="color: #5a5c69;">Carlos M.</p>
-                            <p class="text-xs" style="color: #858796;">47 días de racha</p>
+                            <p class="font-bold text-sm text-white">Carlos M.</p>
+                            <p class="text-xs text-[#6666a0]">47 días de racha</p>
                         </div>
                     </div>
                 </div>
-                <div class="testimonial-card">
-                    <div class="flex items-center gap-1 mb-3" style="color: #f6c23e;">
+                <div class="glass-card p-8">
+                    <div class="flex items-center gap-1 mb-4 text-[#f6c23e] text-sm">
                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
-                    <p class="text-sm leading-relaxed mb-4" style="color: #5a5c69;">
-                        "La mejor parte son las metas de ahorro. Nunca había visto una app de hábitos que me ayudara también con mis finanzas."
+                    <p class="testimonial-quote text-[0.95rem] leading-relaxed text-[#c0c0d0] mb-6">
+                        "Nunca había visto una app de hábitos que también me ayudara con mis finanzas. Las metas de ahorro son mi parte favorita."
                     </p>
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background: #1cc88a;">VR</div>
+                        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-[#1cc88a] to-[#14a06e] flex items-center justify-center text-white font-bold text-sm">VR</div>
                         <div>
-                            <p class="font-bold text-sm" style="color: #5a5c69;">Valentina R.</p>
-                            <p class="text-xs" style="color: #858796;">Ahorradora constante</p>
+                            <p class="font-bold text-sm text-white">Valentina R.</p>
+                            <p class="text-xs text-[#6666a0]">Ahorradora constante</p>
                         </div>
                     </div>
                 </div>
-                <div class="testimonial-card">
-                    <div class="flex items-center gap-1 mb-3" style="color: #f6c23e;">
+                <div class="glass-card p-8">
+                    <div class="flex items-center gap-1 mb-4 text-[#f6c23e] text-sm">
                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
-                    <p class="text-sm leading-relaxed mb-4" style="color: #5a5c69;">
-                        "Es simple, bonita, y funciona. Eso es todo lo que necesito."
+                    <p class="testimonial-quote text-[0.95rem] leading-relaxed text-[#c0c0d0] mb-6">
+                        "Es simple, bonita y sobre todo funciona. En un mes ya noté la diferencia en mi productividad diaria."
                     </p>
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" style="background: #f6c23e;">AP</div>
+                        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-[#f6c23e] to-[#e0a800] flex items-center justify-center text-white font-bold text-sm">AP</div>
                         <div>
-                            <p class="font-bold text-sm" style="color: #5a5c69;">Andrés P.</p>
-                            <p class="text-xs" style="color: #858796;">Usuario premium</p>
+                            <p class="font-bold text-sm text-white">Andrés P.</p>
+                            <p class="text-xs text-[#6666a0]">Usuario premium</p>
                         </div>
                     </div>
                 </div>
@@ -535,89 +824,95 @@
     </section>
 
     <!-- ====== CTA FINAL ====== -->
-    <section class="py-16 md:py-24 gradient-cta relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full bg-white/5"></div>
+    <section class="py-28 md:py-36 relative overflow-hidden">
+        <div class="divider-gradient absolute top-0 left-0 right-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(78,115,223,0.04)] to-transparent"></div>
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4">
-                ¿Listo para ser tu mejor versión?
+            <div class="reveal-scale">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#4e73df] to-[#1cc88a] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-[#4e73df]/20">
+                    <i class="fas fa-leaf text-white text-3xl"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 reveal delay-1">
+                ¿Listo para tomar<br>
+                <span class="glow-text">las riendas de tu vida</span>?
             </h2>
-            <p class="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-                Únete a miles de personas que ya están mejorando un hábito a la vez.
-                <strong class="text-white">Gratis para siempre</strong> (con opción premium).
+            <p class="text-lg md:text-xl text-[#8888a0] max-w-2xl mx-auto mb-10 reveal delay-2">
+                Únete a más de <strong class="text-white">12,000 personas</strong> que ya están transformando su día a día.
+                Un hábito a la vez. Gratis para siempre.
             </p>
-            <a href="{{ url_for('register') }}"
-               class="inline-flex items-center gap-2 bg-white text-[#4e73df] px-10 py-4 rounded-full text-xl font-extrabold shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
-                Comenzar ahora
-                <i class="fas fa-arrow-right"></i>
-            </a>
-            <p class="text-white/60 text-sm mt-4">
-                <i class="fas fa-lock"></i> Sin compromiso. Cancela cuando quieras.
+            <div class="reveal delay-3">
+                <a href="{{ url_for('register') }}"
+                   class="btn-glow relative inline-flex items-center gap-3 bg-gradient-to-r from-[#4e73df] to-[#1cc88a] text-white px-12 py-5 rounded-full text-xl font-bold shadow-2xl shadow-[#4e73df]/25">
+                    Empieza ahora — es gratis
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <p class="text-xs text-[#5555a0] mt-6 reveal delay-4">
+                <i class="fas fa-lock mr-1.5"></i> Sin tarjeta de crédito. Sin compromiso. Cancela cuando quieras.
             </p>
         </div>
     </section>
 
     <!-- ====== FOOTER ====== -->
-    <footer class="bg-gray-900 text-gray-400 py-12">
+    <footer class="border-t border-[rgba(255,255,255,0.04)] py-16 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <!-- Brand -->
+            <div class="grid md:grid-cols-4 gap-10">
                 <div class="md:col-span-1">
-                    <div class="flex items-center space-x-2 text-white mb-4">
-                        <i class="fas fa-leaf text-2xl" style="color: #1cc88a;"></i>
-                        <span class="text-xl font-extrabold">BetterMe</span>
-                    </div>
-                    <p class="text-sm leading-relaxed">Tu compañero diario para convertir buenas intenciones en hábitos reales.</p>
+                    <a href="{{ url_for('index') }}" class="flex items-center gap-2.5 text-white mb-4">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#4e73df] to-[#1cc88a] flex items-center justify-center">
+                            <i class="fas fa-leaf text-white text-xs"></i>
+                        </div>
+                        <span class="text-lg font-bold">BetterMe</span>
+                    </a>
+                    <p class="text-sm text-[#6666a0] leading-relaxed max-w-xs">
+                        Tu compañero diario para convertir buenas intenciones en hábitos reales.
+                    </p>
                 </div>
-                <!-- Links -->
                 <div>
-                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Empresa</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Sobre nosotros</a></li>
-                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contacto</a></li>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-[0.15em] mb-5">Empresa</h4>
+                    <ul class="space-y-3 text-sm text-[#6666a0]">
+                        <li><a href="#" class="hover:text-white transition-colors">Sobre nosotros</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contacto</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Legal</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Términos y condiciones</a></li>
-                        <li><a href="#" class="hover:text-white transition">Política de privacidad</a></li>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-[0.15em] mb-5">Legal</h4>
+                    <ul class="space-y-3 text-sm text-[#6666a0]">
+                        <li><a href="#" class="hover:text-white transition-colors">Términos y condiciones</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Política de privacidad</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Síguenos</h4>
-                    <div class="flex space-x-4 text-xl">
-                        <a href="#" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="hover:text-white transition"><i class="fab fa-tiktok"></i></a>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-[0.15em] mb-5">Síguenos</h4>
+                    <div class="flex space-x-4 text-lg text-[#6666a0]">
+                        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-tiktok"></i></a>
                     </div>
-                    <div class="mt-6">
-                        <p class="text-xs">¿Preguntas? Escríbenos a</p>
-                        <a href="mailto:hola@betterme.app" class="text-sm text-[#4e73df] hover:underline">hola@betterme.app</a>
+                    <div class="mt-8">
+                        <p class="text-xs text-[#5555a0]">¿Preguntas?</p>
+                        <a href="mailto:hola@betterme.app" class="text-sm text-[#8899dd] hover:text-white transition-colors">hola@betterme.app</a>
                     </div>
                 </div>
             </div>
-            <div class="border-t border-gray-800 mt-10 pt-8 text-center text-sm">
-                <p>&copy; 2024 BetterMe. Desarrollado por <span class="text-white font-semibold">Javier Gómez Villarruel 2230956</span></p>
+            <div class="divider-gradient mt-12 mb-8"></div>
+            <div class="text-center text-sm text-[#5555a0]">
+                &copy; 2024 BetterMe. Desarrollado por <span class="text-white font-semibold">Javier Gómez Villarruel 2230956</span>
             </div>
         </div>
     </footer>
 
     <!-- ====== JAVASCRIPT ====== -->
     <script>
-    // Mobile menu toggle
+    // ─── Mobile menu ─────────────────────────────────────────
     function toggleMobileMenu() {
         const menu = document.getElementById('mobileMenu');
         const icon = document.getElementById('menuIcon');
         menu.classList.toggle('hidden');
-        if (menu.classList.contains('hidden')) {
-            icon.className = 'fas fa-bars';
-        } else {
-            icon.className = 'fas fa-times';
-        }
+        icon.className = menu.classList.contains('hidden') ? 'fas fa-bars' : 'fas fa-times';
     }
-
-    // Close mobile menu on link click
     document.querySelectorAll('#mobileMenu a').forEach(link => {
         link.addEventListener('click', () => {
             document.getElementById('mobileMenu').classList.add('hidden');
@@ -625,7 +920,33 @@
         });
     });
 
-    // Smooth scroll for anchor links
+    // ─── Navbar scroll effect ────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        if (scrollY > 60) {
+            navbar.classList.add('navbar-scrolled');
+        } else {
+            navbar.classList.remove('navbar-scrolled');
+        }
+        lastScroll = scrollY;
+    });
+
+    // ─── Reveal on scroll (IntersectionObserver) ─────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.10, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-stagger').forEach(el => {
+        revealObserver.observe(el);
+    });
+
+    // ─── Smooth scroll for anchor links ─────────────────────
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
@@ -638,59 +959,37 @@
         });
     });
 
-    // Counter animation for statistics
-    function animateCounters() {
-        const counters = document.querySelectorAll('.counter');
-        counters.forEach(counter => {
-            const text = counter.textContent;
-            const isK = text.includes('K');
-            const hasPlus = text.includes('+');
-            const cleanText = text.replace(/[+,K]/g, '').replace(/,/g, '');
-            const numTarget = parseInt(cleanText);
-
-            if (isNaN(numTarget)) return;
-
-            let current = 0;
-            const increment = Math.ceil(numTarget / 60);
-            const step = Math.max(1, increment);
-
-            const updateCounter = () => {
-                current += step;
-                if (current >= numTarget) {
-                    current = numTarget;
-                    counter.textContent = current.toLocaleString() + (hasPlus ? '+' : '');
-                    return;
-                }
-                counter.textContent = current.toLocaleString() + (hasPlus ? '+' : '');
-                requestAnimationFrame(updateCounter);
-            };
-            updateCounter();
-        });
-    }
-
-    // Trigger counters when section is visible
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateCounters();
-                observer.disconnect();
+    // ─── 3D Tilt effect on cards ────────────────────────────
+    document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / centerY * -6;
+            const rotateY = (x - centerX) / centerX * 6;
+            const inner = card.querySelector('.tilt-card-inner');
+            if (inner) {
+                inner.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
             }
         });
-    }, { threshold: 0.5 });
+        card.addEventListener('mouseleave', () => {
+            const inner = card.querySelector('.tilt-card-inner');
+            if (inner) {
+                inner.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            }
+        });
+    });
 
-    const statsSection = document.querySelector('.gradient-hero .grid');
-    if (statsSection) {
-        observer.observe(statsSection.closest('section'));
-    }
-
-    // Navbar shadow on scroll
+    // ─── Floating shapes parallax on scroll ─────────────────
     window.addEventListener('scroll', () => {
-        const nav = document.querySelector('nav');
-        if (window.scrollY > 50) {
-            nav.classList.add('shadow-2xl');
-        } else {
-            nav.classList.remove('shadow-2xl');
-        }
+        const scrollY = window.scrollY;
+        const shapes = document.querySelectorAll('.float-shape');
+        shapes.forEach((shape, i) => {
+            const speed = 0.02 + (i * 0.01);
+            shape.style.transform = `translateY(${scrollY * speed}px)`;
+        });
     });
     </script>
 </body>

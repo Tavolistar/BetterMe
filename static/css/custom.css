@@ -82,6 +82,16 @@
     font-size: 1.5rem;
 }
 
+/* ─── Sidebar fijo al hacer scroll ─────────────────────────── */
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
 /* ─── Checkbox personalizado para hábitos/tareas ────────────── */
 
 .task-card .form-check-input:checked + .form-check-label {
