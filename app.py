@@ -1398,6 +1398,22 @@ def api_savings_goals_progress():
 
 # ─── RUTA DE DIAGNOSTICO (para depurar Render) ────────────────────
 
+@app.route("/reset-test-user")
+def reset_test_user():
+    """Resetea la contrasena del usuario test a test123."""
+    from werkzeug.security import generate_password_hash
+    user = User.query.filter_by(email='test@test.com').first()
+    if not user:
+        return jsonify({'error': 'Usuario test@test.com no existe'}), 404
+    user.password_hash = generate_password_hash('test123')
+    user.name = 'TestUser'
+    if not UserProgress.query.filter_by(user_id=user.id).first():
+        db.session.add(UserProgress(user_id=user.id, coins=500))
+    db.session.commit()
+    log.info(f"Usuario test reseteado: id={user.id}, nombre=TestUser, password=test123")
+    return jsonify({'ok': True, 'msg': 'Contrasena reseteada a test123. Nombre actualizado a TestUser.', 'user_id': user.id})
+
+
 @app.route("/debug-db")
 def debug_db():
     """Muestra el estado de la base de datos en produccion."""
