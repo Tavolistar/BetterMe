@@ -57,11 +57,9 @@
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
         </div>
     </ul>
-    <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
-        <!-- Main Content -->
         <div id="content">
             <!-- Topbar -->
             <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -92,126 +90,190 @@
                     </li>
                 </ul>
             </nav>
-            <!-- End of Topbar -->
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
-                <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">
                         <i class="fas fa-crown text-warning"></i> BetterMe Premium
                     </h1>
                 </div>
 
-                <!-- Pricing Cards -->
-                <div class="row justify-content-center">
-                    <!-- Plan Gratuito -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-header py-3 bg-white text-center border-0">
-                                <div class="text-center mb-3 mt-3">
-                                    <div class="d-inline-flex align-items-center justify-content-center"
-                                         style="width: 80px; height: 80px; border-radius: 50%; background: #f8f9fc;">
-                                        <i class="fas fa-leaf fa-3x text-success"></i>
-                                    </div>
-                                </div>
-                                <h4 class="font-weight-bold">Gratuito</h4>
-                                <p class="text-muted mb-0">Para empezar tu viaje</p>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="mb-4">
-                                    <span class="display-4 font-weight-bold text-gray-800">$0</span>
-                                    <span class="text-muted">/mes</span>
-                                </div>
-                                <ul class="list-unstyled text-left mb-4" style="line-height: 2.2;">
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> 3 hábitos diarios</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de monedas</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Rachas y calendario</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Tienda de avatares</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de ahorros básico</li>
-                                    <li><i class="fas fa-times-circle text-muted mr-2"></i> Estadísticas avanzadas</li>
-                                    <li><i class="fas fa-times-circle text-muted mr-2"></i> Metas de ahorro ilimitadas</li>
-                                    <li><i class="fas fa-times-circle text-muted mr-2"></i> Soporte prioritario</li>
-                                </ul>
-                                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-block">
-                                    Tu plan actual
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Plan Premium -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <div class="card shadow h-100 border-warning">
-                            <div class="card-header py-2 bg-warning text-center border-0">
+                <!-- Plan Card -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-6">
+                        <div class="card shadow border-warning h-100">
+                            <div class="card-header py-3 bg-warning text-center border-0">
                                 <span class="text-white font-weight-bold text-uppercase small">
-                                    <i class="fas fa-star"></i> Más popular
+                                    <i class="fas fa-star"></i> Sin anuncios + IA
                                 </span>
                             </div>
-                            <div class="card-body text-center">
-                                <div class="text-center mb-3 mt-2">
+                            <div class="card-body text-center p-5">
+                                <div class="text-center mb-4">
                                     <div class="d-inline-flex align-items-center justify-content-center"
-                                         style="width: 80px; height: 80px; border-radius: 50%; background: #fff8e6;">
+                                         style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #fff8e6, #ffe8b0);">
                                         <i class="fas fa-crown fa-3x text-warning"></i>
                                     </div>
                                 </div>
-                                <h4 class="font-weight-bold">Premium</h4>
-                                <p class="text-muted mb-0">La experiencia completa</p>
-                                <div class="mb-4 mt-3">
-                                    <span class="display-4 font-weight-bold text-warning">$5,000</span>
+                                <h3 class="font-weight-bold text-dark">BetterMe Premium</h3>
+                                <p class="text-muted">Sin anuncios. Con planes guiados por IA.</p>
+                                <div class="my-4">
+                                    <span class="display-4 font-weight-bold text-warning">$5</span>
                                     <span class="text-muted">/mes</span>
                                 </div>
-                                <ul class="list-unstyled text-left mb-4" style="line-height: 2.2;">
+                                <p class="text-muted small">Pesos mexicanos</p>
+
+                                <ul class="list-unstyled text-left mb-4 mx-auto" style="max-width: 320px; line-height: 2.2;">
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Navegación sin anuncios</li>
                                     <li><i class="fas fa-check-circle text-success mr-2"></i> Hábitos ilimitados</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de monedas</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Rachas y calendario</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Tienda de avatares</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Sistema de ahorros completo</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Estadísticas avanzadas</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Estadísticas completas</li>
                                     <li><i class="fas fa-check-circle text-success mr-2"></i> Metas de ahorro ilimitadas</li>
-                                    <li><i class="fas fa-check-circle text-success mr-2"></i> Soporte prioritario 24/7</li>
+                                    <li><i class="fas fa-check-circle text-success mr-2"></i> <strong>Planes guiados con IA</strong></li>
                                 </ul>
-                                <button class="btn btn-warning btn-block font-weight-bold" disabled>
-                                    <i class="fas fa-lock mr-2"></i> Próximamente
+
+                                <button class="btn btn-warning btn-lg btn-block font-weight-bold shadow" disabled>
+                                    <i class="fas fa-rocket mr-2"></i> Suscribirme — Próximamente
                                 </button>
-                                <p class="text-muted small mt-2">Pasarela de pago en desarrollo</p>
+                                <p class="text-muted small mt-2 mb-0">Pasarela de pago en desarrollo</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Features Premium -->
-                <div class="row mt-4">
+                <!-- IA Guided Plans -->
+                <div class="row">
                     <div class="col-12">
                         <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">
-                                    <i class="fas fa-gem"></i> ¿Qué incluye Premium?
+                            <div class="card-header py-3 bg-gradient-primary">
+                                <h6 class="m-0 font-weight-bold text-white">
+                                    <i class="fas fa-robot"></i> Planes Guiados con IA
                                 </h6>
                             </div>
                             <div class="card-body">
+                                <p class="text-muted mb-4">
+                                    Nuestra inteligencia artificial diseña planes personalizados para desarrollar
+                                    hábitos específicos. Solo con BetterMe Premium.
+                                </p>
                                 <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <div class="text-center p-3">
-                                            <i class="fas fa-infinity fa-3x text-warning mb-3"></i>
-                                            <h6 class="font-weight-bold">Hábitos ilimitados</h6>
-                                            <p class="text-muted small">Sin límite de hábitos diarios. Crea todos los que necesites.</p>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card border-left-info shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="text-center mb-3">
+                                                    <i class="fas fa-brain fa-3x text-info"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-info text-center">Plan anti-procrastinación</h6>
+                                                <p class="text-muted small text-center">
+                                                    La IA te guía paso a paso para vencer la procrastinación.
+                                                    Técnicas Pomodoro, bloqueo de tiempo y micro-hábitos diarios.
+                                                </p>
+                                                <div class="text-center">
+                                                    <span class="badge badge-info">21 días</span>
+                                                    <span class="badge badge-secondary ml-1">IA-powered</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="text-center p-3">
-                                            <i class="fas fa-chart-bar fa-3x text-warning mb-3"></i>
-                                            <h6 class="font-weight-bold">Estadísticas avanzadas</h6>
-                                            <p class="text-muted small">Gráficas detalladas, reportes semanales y análisis de tendencias.</p>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card border-left-success shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="text-center mb-3">
+                                                    <i class="fas fa-heartbeat fa-3x text-success"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-success text-center">Plan fitness personalizado</h6>
+                                                <p class="text-muted small text-center">
+                                                    Rutinas de ejercicio, alimentación y descanso adaptadas
+                                                    a tu nivel y objetivos por inteligencia artificial.
+                                                </p>
+                                                <div class="text-center">
+                                                    <span class="badge badge-success">30 días</span>
+                                                    <span class="badge badge-secondary ml-1">IA-powered</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="text-center p-3">
-                                            <i class="fas fa-headset fa-3x text-warning mb-3"></i>
-                                            <h6 class="font-weight-bold">Soporte prioritario</h6>
-                                            <p class="text-muted small">Atención personalizada 24/7 para resolver cualquier duda.</p>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card border-left-warning shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="text-center mb-3">
+                                                    <i class="fas fa-book-reader fa-3x text-warning"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-warning text-center">Plan lectura diaria</h6>
+                                                <p class="text-muted small text-center">
+                                                    La IA te recomienda lecturas, te motiva con recordatorios
+                                                    y adapta el ritmo según tu progreso real.
+                                                </p>
+                                                <div class="text-center">
+                                                    <span class="badge badge-warning">14 días</span>
+                                                    <span class="badge badge-secondary ml-1">IA-powered</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card border-left-danger shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="text-center mb-3">
+                                                    <i class="fas fa-smoking-ban fa-3x text-danger"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-danger text-center">Plan dejar de fumar</h6>
+                                                <p class="text-muted small text-center">
+                                                    Programa guiado con hitos diarios, recompensas virtuales
+                                                    y comunidad de apoyo. 100% personalizado.
+                                                </p>
+                                                <div class="text-center">
+                                                    <span class="badge badge-danger">90 días</span>
+                                                    <span class="badge badge-secondary ml-1">IA-powered</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card border-left-primary shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="text-center mb-3">
+                                                    <i class="fas fa-bed fa-3x text-primary"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-primary text-center">Plan higiene del sueño</h6>
+                                                <p class="text-muted small text-center">
+                                                    La IA monitorea tus patrones y te guía hacia un sueño
+                                                    reparador con rutinas personalizadas cada noche.
+                                                </p>
+                                                <div class="text-center">
+                                                    <span class="badge badge-primary">7 días</span>
+                                                    <span class="badge badge-secondary ml-1">IA-powered</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card border-left-dark shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="text-center mb-3">
+                                                    <i class="fas fa-meditation fa-3x text-dark"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-dark text-center">Plan meditación y mindfulness</h6>
+                                                <p class="text-muted small text-center">
+                                                    Sesiones guiadas por IA que se adaptan a tu estado de ánimo
+                                                    y nivel de estrés. De 5 a 30 minutos diarios.
+                                                </p>
+                                                <div class="text-center">
+                                                    <span class="badge badge-dark">30 días</span>
+                                                    <span class="badge badge-secondary ml-1">IA-powered</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <p class="text-muted small">
+                                        <i class="fas fa-lock text-warning"></i>
+                                        Estos planes requieren suscripción Premium ($5/mes).
+                                        Diseñados para transformar tus hábitos de verdad.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -219,11 +281,8 @@
                 </div>
 
             </div>
-            <!-- /.container-fluid -->
         </div>
-        <!-- End of Main Content -->
 
-        <!-- Footer -->
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
@@ -232,8 +291,11 @@
             </div>
         </footer>
     </div>
-    <!-- End of Content Wrapper -->
-
 </div>
-<!-- End of Page Wrapper -->
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+}
+</style>
 {% endblock %}

@@ -236,3 +236,44 @@ class SavingsGoal(db.Model):
 
     def __repr__(self):
         return f'<SavingsGoal {self.id}: {self.name} ${self.current_amount}/${self.target_amount}>'
+
+
+class ViceTracker(db.Model):
+    """Contador de dias sin un vicio o mal habito."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    vice_name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_reset = db.Column(db.DateTime, default=datetime.utcnow)
+    last_milestone = db.Column(db.Integer, default=0)
+
+    user = db.relationship('User', backref=db.backref('vice_trackers', lazy='dynamic'))
+
+    MILESTONES = [5, 10, 20, 40, 80, 160, 365]
+    COINS_PER_MILESTONE = 50
+
+    def days_clean(self):
+        return (date.today() - self.last_reset.date()).days
+
+    def next_milestone(self):
+        today = self.days_clean()
+        for m in self.MILESTONES:
+            if m > self.last_milestone:
+                return {'days': m, 'remaining': m - today if m > today else 0}
+        return None
+
+    def check_and_award(self):
+        today = self.days_clean()
+        awarded = 0
+        for m in self.MILESTONES:
+            if m > self.last_milestone and today >= m:
+                self.last_milestone = m
+                awarded += self.COINS_PER_MILESTONE
+        return awarded
+
+    def reset_vice(self):
+        self.last_reset = datetime.utcnow()
+        self.last_milestone = 0
+
+    def __repr__(self):
+        return f'<ViceTracker {self.id}: {self.vice_name} user={self.user_id} days={self.days_clean()}>'

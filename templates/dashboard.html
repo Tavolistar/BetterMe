@@ -240,6 +240,103 @@
                     </div>
                 </div>
 
+                <!-- Contador de Vicios (dias sin malos habitos) -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-danger">
+                            <i class="fas fa-ban"></i> Contador de Días Sin Vicios
+                        </h6>
+                        <button class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#addViceModal">
+                            <i class="fas fa-plus"></i> Agregar vicio
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {% if vices %}
+                        <div class="row">
+                            {% for vice in vices %}
+                            <div class="col-xl-4 col-md-6 mb-3">
+                                <div class="card border-left-danger shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                    {{ vice.vice_name }}
+                                                </div>
+                                                {% set dias = vice.days_clean() %}
+                                                <div class="h3 mb-0 font-weight-bold text-gray-800">
+                                                    {{ dias }} <small class="text-muted" style="font-size:0.6rem;">días sin</small>
+                                                </div>
+                                                {% set prox = vice.next_milestone() %}
+                                                {% if prox %}
+                                                <div class="text-xs text-muted mt-1">
+                                                    Próximo hito: {{ prox.days }} días (faltan {{ prox.remaining }})
+                                                    <span class="text-warning">+50 🪙</span>
+                                                </div>
+                                                <div class="progress mt-1" style="height:4px;">
+                                                    {% set pct = ((dias / prox.days) * 100)|round|int %}
+                                                    {% if pct > 100 %}{% set pct = 100 %}{% endif %}
+                                                    <div class="progress-bar bg-warning" style="width:{{ pct }}%"></div>
+                                                </div>
+                                                {% endif %}
+                                                <div class="text-xs text-muted mt-1">
+                                                    Mejor racha: {{ vice.last_milestone }} días
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-hand-peace fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 text-right">
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="resetVice({{ vice.id }})"
+                                                    title="Recaí :(">
+                                                <i class="fas fa-undo"></i> Recaí
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary ml-1"
+                                                    onclick="deleteVice({{ vice.id }})"
+                                                    title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-shield-haltered fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-gray-500 mb-2">No tienes ningún vicio registrado.</p>
+                            <p class="text-muted small">
+                                Agrega un mal hábito que quieras dejar (ej: fumar, alcohol, redes sociales)
+                                y BetterMe contará tus días sin él. Cada 5, 10, 20, 40, 80, 160 y 365 días
+                                recibirás <strong class="text-warning">50 monedas</strong> de recompensa.
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Modal para agregar vicio -->
+                <div class="modal fade" id="addViceModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title"><i class="fas fa-ban"></i> Agregar Vicio</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-muted small">¿Qué hábito quieres dejar? Te ayudaremos a mantener la racha.</p>
+                                <input type="text" id="viceName" class="form-control" placeholder="Ej: Fumar, Redes sociales, Alcohol...">
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button class="btn btn-danger" onclick="addVice()">Empezar contador</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Content Row - Main Content -->
                 <div class="row">
 
@@ -684,7 +781,7 @@ function loadStreakCalendar() {
         });
 }
 
-// Cargar gráficas y calendario cuando el DOM esté listo
+// Cargar graficas y calendario cuando el DOM este listo
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         if (typeof loadHabitChart === 'function') loadHabitChart();
@@ -692,6 +789,42 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof loadStreakCalendar === 'function') loadStreakCalendar();
     }, 500);
 });
+
+// ─── Funciones de Vicios ──────────────────────────────────
+function addVice() {
+    const name = document.getElementById('viceName').value.trim();
+    if (name.length < 2) { alert('Escribe un nombre valido'); return; }
+    const form = new FormData();
+    form.append('name', name);
+    fetch('/api/vice/add', { method: 'POST', body: form })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) { alert(data.error); return; }
+            location.reload();
+        });
+}
+
+function resetVice(id) {
+    if (!confirm('¿Recaiste? El contador volvera a cero.')) return;
+    const form = new FormData();
+    form.append('id', id);
+    fetch('/api/vice/reset', { method: 'POST', body: form })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) location.reload();
+        });
+}
+
+function deleteVice(id) {
+    if (!confirm('¿Eliminar este contador permanentemente?')) return;
+    const form = new FormData();
+    form.append('id', id);
+    fetch('/api/vice/delete', { method: 'POST', body: form })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) location.reload();
+        });
+}
 </script>
 
 {% endblock %}

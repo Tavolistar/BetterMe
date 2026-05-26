@@ -8,7 +8,7 @@ import secrets
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 
-from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog, ShopItem, CoinTransaction, UserPurchase, Category, Transaction, SavingsGoal
+from models import db, User, Task, Habit, UserHabit, UserProgress, HabitLog, ShopItem, CoinTransaction, UserPurchase, Category, Transaction, SavingsGoal, ViceTracker
 
 # Cargar variables de entorno
 load_dotenv()
@@ -625,6 +625,24 @@ def dashboard():
     completed_habits = sum(1 for uh in user_habits_data if uh['user_habit'].completed)
     progress_percentage = int((completed_habits / total_habits * 100)) if total_habits > 0 else 0
 
+    # Obtener contadores de vicios y verificar hitos
+    vices = ViceTracker.query.filter_by(user_id=user_id).all()
+    vice_coins_awarded = 0
+    for v in vices:
+        awarded = v.check_and_award()
+        if awarded > 0:
+            vice_coins_awarded += awarded
+            progress.coins += awarded
+            db.session.add(CoinTransaction(
+                user_id=user_id,
+                amount=awarded,
+                concept=f'Hito: {v.last_milestone} dias sin {v.vice_name}'
+            ))
+    if vice_coins_awarded > 0:
+        db.session.commit()
+        for v in vices:
+            db.session.refresh(v)
+
     return render_template("dashboard.html",
                            tasks=tasks,
                            user_habits_data=user_habits_data,
@@ -633,7 +651,8 @@ def dashboard():
                            best_streak=progress.best_streak if progress else 0,
                            progress_percentage=progress_percentage,
                            completed_habits=completed_habits,
-                           total_habits=total_habits)
+                           total_habits=total_habits,
+                           vices=vices)
 
 
 @app.route("/add_task", methods=['POST'])
@@ -1394,6 +1413,47 @@ def api_savings_goals_progress():
         })
 
     return jsonify({'goals': data})
+
+
+# ─── CONTADOR DE VICIOS ───────────────────────────────────────────
+
+@app.route("/api/vice/add", methods=['POST'])
+@login_required
+def api_vice_add():
+    user_id = session['user_id']
+    name = request.form.get('name', '').strip()
+    if not name or len(name) < 2:
+        return jsonify({'error': 'Nombre muy corto'}), 400
+    if ViceTracker.query.filter_by(user_id=user_id, vice_name=name).first():
+        return jsonify({'error': 'Ya existe ese vicio'}), 400
+    vt = ViceTracker(user_id=user_id, vice_name=name)
+    db.session.add(vt)
+    db.session.commit()
+    return jsonify({'ok': True, 'id': vt.id, 'name': vt.vice_name, 'days': vt.days_clean()})
+
+@app.route("/api/vice/reset", methods=['POST'])
+@login_required
+def api_vice_reset():
+    user_id = session['user_id']
+    vice_id = request.form.get('id', type=int)
+    vt = ViceTracker.query.filter_by(id=vice_id, user_id=user_id).first()
+    if not vt:
+        return jsonify({'error': 'Vicio no encontrado'}), 404
+    vt.reset_vice()
+    db.session.commit()
+    return jsonify({'ok': True, 'name': vt.vice_name, 'days': 0})
+
+@app.route("/api/vice/delete", methods=['POST'])
+@login_required
+def api_vice_delete():
+    user_id = session['user_id']
+    vice_id = request.form.get('id', type=int)
+    vt = ViceTracker.query.filter_by(id=vice_id, user_id=user_id).first()
+    if not vt:
+        return jsonify({'error': 'Vicio no encontrado'}), 404
+    db.session.delete(vt)
+    db.session.commit()
+    return jsonify({'ok': True})
 
 
 # ─── RUTA DE DIAGNOSTICO (para depurar Render) ────────────────────

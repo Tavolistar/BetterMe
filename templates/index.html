@@ -420,6 +420,73 @@
             transform: scale(1.1);
             border-radius: 12px;
         }
+
+        /* ─── ZOOM LUPA ─── */
+        .zoomable { cursor: zoom-in; transition: transform 0.3s ease; }
+        .zoom-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        .zoom-modal.active { display: flex; }
+        .zoom-modal img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transform-origin: center center;
+            transition: transform 0.15s ease;
+        }
+        .zoom-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10001;
+        }
+        .zoom-controls button {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .zoom-controls button:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+        }
+        .zoom-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-modal.active ~ .zoom-close { display: flex; }
     </style>
 </head>
 <body>
@@ -546,7 +613,7 @@
                     <div class="relative z-10">
                         <img src="{{ url_for('static', filename='img/dashboard-preview.png') }}"
                              alt="Dashboard BetterMe"
-                             class="hero-mockup w-full rounded-2xl"
+                             class="hero-mockup w-full rounded-2xl zoomable"
                              onerror="this.parentElement.innerHTML=`
                                 <div class=\'img-placeholder p-12\'>
                                     <i class=\'fas fa-leaf text-5xl mb-4 opacity-50\'></i>
@@ -748,9 +815,9 @@
                     </div>
                 </div>
                 <div class="reveal-right">
-                    <img src="{{ url_for('static', filename='img/dashboard-preview.png') }}"
-                         alt="Gamificación BetterMe"
-                         class="hero-mockup w-full rounded-2xl"
+                    <img src="{{ url_for('static', filename='img/gamification-preview.png') }}"
+                         alt="Gamificacion BetterMe"
+                         class="hero-mockup w-full rounded-2xl zoomable"
                          onerror="this.parentElement.innerHTML=`
                             <div class=\'img-placeholder p-12\'>
                                 <i class=\'fas fa-trophy text-5xl mb-4 opacity-50\'></i>
@@ -904,6 +971,17 @@
         </div>
     </footer>
 
+    <!-- ====== ZOOM MODAL ====== -->
+    <div class="zoom-modal" id="zoomModal">
+        <img id="zoomImg" src="" alt="Zoom">
+        <div class="zoom-controls" id="zoomControls">
+            <button onclick="zoomIn()"><i class="fas fa-search-plus"></i></button>
+            <button onclick="zoomOut()"><i class="fas fa-search-minus"></i></button>
+            <button onclick="zoomReset()"><i class="fas fa-expand"></i></button>
+        </div>
+    </div>
+    <button class="zoom-close" id="zoomClose" onclick="closeZoom()"><i class="fas fa-times"></i></button>
+
     <!-- ====== JAVASCRIPT ====== -->
     <script>
     // ─── Mobile menu ─────────────────────────────────────────
@@ -990,6 +1068,95 @@
             const speed = 0.02 + (i * 0.01);
             shape.style.transform = `translateY(${scrollY * speed}px)`;
         });
+    });
+
+    // ─── ZOOM LUPA ─────────────────────────────────────────
+    const zoomModal = document.getElementById('zoomModal');
+    const zoomImg = document.getElementById('zoomImg');
+    const zoomClose = document.getElementById('zoomClose');
+    const zoomControls = document.getElementById('zoomControls');
+    let currentScale = 1;
+    let currentTranslateX = 0;
+    let currentTranslateY = 0;
+    let isDragging = false;
+    let dragStartX, dragStartY, dragTranslateX, dragTranslateY;
+
+    document.querySelectorAll('.zoomable').forEach(img => {
+        img.addEventListener('click', () => {
+            zoomImg.src = img.src;
+            zoomImg.alt = img.alt;
+            currentScale = 1;
+            currentTranslateX = 0;
+            currentTranslateY = 0;
+            applyZoomTransform();
+            zoomModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    function closeZoom() {
+        zoomModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    zoomModal.addEventListener('click', (e) => {
+        if (e.target === zoomModal) closeZoom();
+    });
+
+    zoomImg.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = zoomImg.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left - rect.width / 2;
+        const mouseY = e.clientY - rect.top - rect.height / 2;
+
+        const oldScale = currentScale;
+        if (e.deltaY < 0) currentScale = Math.min(currentScale * 1.2, 5);
+        else currentScale = Math.max(currentScale / 1.2, 0.5);
+
+        const scaleChange = currentScale / oldScale;
+        currentTranslateX = currentTranslateX * scaleChange - mouseX * (scaleChange - 1);
+        currentTranslateY = currentTranslateY * scaleChange - mouseY * (scaleChange - 1);
+        applyZoomTransform();
+    });
+
+    zoomImg.addEventListener('mousedown', (e) => {
+        if (currentScale <= 1) return;
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragTranslateX = currentTranslateX;
+        dragTranslateY = currentTranslateY;
+        zoomImg.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        currentTranslateX = dragTranslateX + (e.clientX - dragStartX);
+        currentTranslateY = dragTranslateY + (e.clientY - dragStartY);
+        applyZoomTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        zoomImg.style.cursor = currentScale > 1 ? 'grab' : 'zoom-out';
+    });
+
+    function applyZoomTransform() {
+        zoomImg.style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${currentScale})`;
+        zoomImg.style.cursor = currentScale > 1 ? 'grab' : 'zoom-out';
+    }
+
+    function zoomIn() { currentScale = Math.min(currentScale * 1.5, 5); applyZoomTransform(); }
+    function zoomOut() { currentScale = Math.max(currentScale / 1.5, 0.5); if (currentScale <= 1) { currentTranslateX = 0; currentTranslateY = 0; } applyZoomTransform(); }
+    function zoomReset() { currentScale = 1; currentTranslateX = 0; currentTranslateY = 0; applyZoomTransform(); }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeZoom();
+        if (zoomModal.classList.contains('active')) {
+            if (e.key === '+') zoomIn();
+            if (e.key === '-') zoomOut();
+            if (e.key === '0') zoomReset();
+        }
     });
     </script>
 </body>
