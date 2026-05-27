@@ -1487,8 +1487,16 @@ def refresh_test_data():
     SavingsGoal.query.filter_by(user_id=uid).delete()
     Task.query.filter_by(user_id=uid).delete()
 
-    # Crear HabitLogs ultimos 14 dias
+    # Asegurar UserHabit (vinculo usuario-habito)
     habits = Habit.query.all()
+    has_uh = UserHabit.query.filter_by(user_id=uid).count()
+    if has_uh == 0:
+        for h in habits:
+            db.session.add(UserHabit(user_id=uid, habit_id=h.id))
+        db.session.commit()
+        log.info(f"Creados {len(habits)} UserHabit para user {uid}")
+
+    # Crear HabitLogs ultimos 14 dias
     for i in range(14):
         d = today - timedelta(days=i)
         for h in habits:
