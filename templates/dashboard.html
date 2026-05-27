@@ -240,103 +240,6 @@
                     </div>
                 </div>
 
-                <!-- Contador de Vicios (dias sin malos habitos) -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-danger">
-                            <i class="fas fa-ban"></i> Contador de Días Sin Vicios
-                        </h6>
-                        <button class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#addViceModal">
-                            <i class="fas fa-plus"></i> Agregar vicio
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        {% if vices %}
-                        <div class="row">
-                            {% for vice in vices %}
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <div class="card border-left-danger shadow h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                                    {{ vice.vice_name }}
-                                                </div>
-                                                {% set dias = vice.days_clean() %}
-                                                <div class="h3 mb-0 font-weight-bold text-gray-800">
-                                                    {{ dias }} <small class="text-muted" style="font-size:0.6rem;">días sin</small>
-                                                </div>
-                                                {% set prox = vice.next_milestone() %}
-                                                {% if prox %}
-                                                <div class="text-xs text-muted mt-1">
-                                                    Próximo hito: {{ prox.days }} días (faltan {{ prox.remaining }})
-                                                    <span class="text-warning">+50 🪙</span>
-                                                </div>
-                                                <div class="progress mt-1" style="height:4px;">
-                                                    {% set pct = ((dias / prox.days) * 100)|round|int %}
-                                                    {% if pct > 100 %}{% set pct = 100 %}{% endif %}
-                                                    <div class="progress-bar bg-warning" style="width:{{ pct }}%"></div>
-                                                </div>
-                                                {% endif %}
-                                                <div class="text-xs text-muted mt-1">
-                                                    Mejor racha: {{ vice.last_milestone }} días
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-hand-peace fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 text-right">
-                                            <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="resetVice({{ vice.id }})"
-                                                    title="Recaí :(">
-                                                <i class="fas fa-undo"></i> Recaí
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-secondary ml-1"
-                                                    onclick="deleteVice({{ vice.id }})"
-                                                    title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-shield-haltered fa-3x text-gray-300 mb-3"></i>
-                            <p class="text-gray-500 mb-2">No tienes ningún vicio registrado.</p>
-                            <p class="text-muted small">
-                                Agrega un mal hábito que quieras dejar (ej: fumar, alcohol, redes sociales)
-                                y BetterMe contará tus días sin él. Cada 5, 10, 20, 40, 80, 160 y 365 días
-                                recibirás <strong class="text-warning">50 monedas</strong> de recompensa.
-                            </p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Modal para agregar vicio -->
-                <div class="modal fade" id="addViceModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title"><i class="fas fa-ban"></i> Agregar Vicio</h5>
-                                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                <p class="text-muted small">¿Qué hábito quieres dejar? Te ayudaremos a mantener la racha.</p>
-                                <input type="text" id="viceName" class="form-control" placeholder="Ej: Fumar, Redes sociales, Alcohol...">
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                <button class="btn btn-danger" onclick="addVice()">Empezar contador</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Content Row - Main Content -->
                 <div class="row">
 
@@ -515,6 +418,62 @@
 
                     <!-- Side Panel -->
                     <div class="col-xl-4 col-lg-5">
+
+                        <!-- Contador de Vicios (compacto) -->
+                        <div class="card shadow mb-4 border-left-danger">
+                            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold text-danger small">
+                                    <i class="fas fa-ban"></i> Días sin vicios
+                                </h6>
+                                <button class="btn btn-sm btn-outline-danger btn-xs py-0 px-2" data-toggle="modal" data-target="#addViceModal" style="font-size:0.7rem;">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body py-2">
+                                {% if vices %}
+                                {% for vice in vices %}
+                                {% set dias = vice.days_clean() %}
+                                {% set prox = vice.next_milestone() %}
+                                <div class="mb-2 pb-2 {% if not loop.last %}border-bottom{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="text-xs font-weight-bold text-dark">{{ vice.vice_name }}</span>
+                                            <div class="mt-1">
+                                                <span class="h5 font-weight-bold text-gray-800">{{ dias }}</span>
+                                                <small class="text-muted ml-1">días</small>
+                                                {% if prox %}
+                                                <small class="text-warning ml-2">próx: {{ prox.days }}d (+50🪙)</small>
+                                                {% endif %}
+                                            </div>
+                                            {% if prox %}
+                                            <div class="progress mt-1" style="height:3px;">
+                                                {% set pct = ((dias / prox.days) * 100)|round|int %}
+                                                {% if pct > 100 %}{% set pct = 100 %}{% endif %}
+                                                <div class="progress-bar bg-warning" style="width:{{ pct }}%"></div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="d-flex flex-column gap-1" style="gap:2px;">
+                                            <button class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size:0.6rem;"
+                                                    onclick="resetVice({{ vice.id }})" title="Recaí">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary py-0 px-1" style="font-size:0.6rem;"
+                                                    onclick="deleteVice({{ vice.id }})" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% else %}
+                                <p class="text-center text-muted small mb-0 py-1">
+                                    Sin vicios. <a href="#" data-toggle="modal" data-target="#addViceModal">Agregar</a>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
                                 <h6 class="m-0 font-weight-bold text-primary">
@@ -826,5 +785,25 @@ function deleteVice(id) {
         });
 }
 </script>
+
+<!-- Modal para agregar vicio -->
+<div class="modal fade" id="addViceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-ban"></i> Agregar Vicio</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">¿Qué hábito quieres dejar? Te ayudaremos a mantener la racha.</p>
+                <input type="text" id="viceName" class="form-control" placeholder="Ej: Fumar, Redes sociales, Alcohol...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger" onclick="addVice()">Empezar contador</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

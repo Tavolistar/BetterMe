@@ -1458,20 +1458,96 @@ def api_vice_delete():
 
 # ─── RUTA DE DIAGNOSTICO (para depurar Render) ────────────────────
 
-@app.route("/reset-test-user")
-def reset_test_user():
-    """Resetea la contrasena del usuario test a test123."""
+@app.route("/refresh-test-data")
+def refresh_test_data():
+    """Regenera datos frescos para el usuario test@test.com."""
     from werkzeug.security import generate_password_hash
     user = User.query.filter_by(email='test@test.com').first()
     if not user:
         return jsonify({'error': 'Usuario test@test.com no existe'}), 404
-    user.password_hash = generate_password_hash('test123')
-    user.name = 'TestUser'
-    if not UserProgress.query.filter_by(user_id=user.id).first():
-        db.session.add(UserProgress(user_id=user.id, coins=500))
+
+    uid = user.id
+    today = date.today()
+    now = datetime.now()
+    from random import randint, choice
+
+    # Resetear progreso con monedas
+    prog = UserProgress.query.filter_by(user_id=uid).first()
+    if not prog:
+        prog = UserProgress(user_id=uid, coins=500)
+        db.session.add(prog)
+    else:
+        prog.coins = 500
     db.session.commit()
-    log.info(f"Usuario test reseteado: id={user.id}, nombre=TestUser, password=test123")
-    return jsonify({'ok': True, 'msg': 'Contrasena reseteada a test123. Nombre actualizado a TestUser.', 'user_id': user.id})
+
+    # Eliminar datos viejos del test user
+    HabitLog.query.filter_by(user_id=uid).delete()
+    CoinTransaction.query.filter_by(user_id=uid).delete()
+    Transaction.query.filter_by(user_id=uid).delete()
+    SavingsGoal.query.filter_by(user_id=uid).delete()
+    Task.query.filter_by(user_id=uid).delete()
+
+    # Crear HabitLogs ultimos 14 dias
+    habits = Habit.query.all()
+    for i in range(14):
+        d = today - timedelta(days=i)
+        for h in habits:
+            if (i + h.id) % 3 != 0:
+                db.session.add(HabitLog(user_id=uid, habit_id=h.id, date=d, completed=True))
+    db.session.commit()
+
+    # Crear CoinTransactions ultimos 14 dias
+    for i in range(14):
+        d = today - timedelta(days=i)
+        for _ in range(randint(1, 3)):
+            amount = choice([5, 8, 10, 15])
+            db.session.add(CoinTransaction(
+                user_id=uid, amount=amount,
+                concept=f'Habito completado - Dia {d.strftime("%d/%m")}',
+                created_at=datetime.combine(d, datetime.min.time())
+            ))
+    db.session.commit()
+
+    # Crear Transactions de ahorro ultimos 30 dias
+    income_cats = Category.query.filter_by(type='income').all()
+    expense_cats = Category.query.filter_by(type='expense').all()
+    if income_cats and expense_cats:
+        for i in range(30):
+            d = today - timedelta(days=i)
+            if i % 5 == 0 and income_cats:
+                cat = income_cats[i % len(income_cats)]
+                db.session.add(Transaction(
+                    user_id=uid, category_id=cat.id, amount=choice([500, 800, 1000, 1200, 1500]),
+                    description=f'Ingreso - {cat.name}', date=d, type='income'))
+            if i % 3 == 0 and expense_cats:
+                cat = expense_cats[i % len(expense_cats)]
+                db.session.add(Transaction(
+                    user_id=uid, category_id=cat.id, amount=choice([50, 80, 100, 150, 200]),
+                    description=f'Gasto - {cat.name}', date=d, type='expense'))
+    db.session.commit()
+
+    # Metas de ahorro frescas
+    goals = [
+        SavingsGoal(user_id=uid, name='Viaje a la playa', target_amount=50000, current_amount=15000, deadline=today + timedelta(days=90), color='#4e73df'),
+        SavingsGoal(user_id=uid, name='Fondo de emergencia', target_amount=30000, current_amount=30000, deadline=today + timedelta(days=30), color='#1cc88a', completed=True),
+        SavingsGoal(user_id=uid, name='Curso online', target_amount=10000, current_amount=3500, deadline=today + timedelta(days=45), color='#f6c23e'),
+    ]
+    for g in goals:
+        db.session.add(g)
+    db.session.commit()
+
+    # Tareas frescas
+    db.session.add(Task(text='Leer 10 paginas', completed=False, user_id=uid))
+    db.session.add(Task(text='Meditar 5 minutos', completed=True, user_id=uid))
+    db.session.add(Task(text='Revisar presupuesto mensual', completed=False, user_id=uid))
+    db.session.commit()
+
+    # Actualizar password por si acaso
+    user.password_hash = generate_password_hash('test123')
+    db.session.commit()
+
+    log.info(f"Datos frescos regenerados para test@test.com (user {uid})")
+    return jsonify({'ok': True, 'msg': 'Datos frescos regenerados. test@test.com / test123', 'user_id': uid})
 
 
 @app.route("/debug-db")
